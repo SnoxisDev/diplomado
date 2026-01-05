@@ -1,1 +1,56 @@
-<h1>Bienvenido Paciente</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rehabilitación</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { padding: 20px; background-color: #f4f6f9; font-family: sans-serif; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Tarjeta de Ejercicio */
+        .task-card { 
+            background: white; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            border-left: 5px solid #ffc107; /* Amarillo = Pendiente */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-start { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-weight: bold;
+        }
+        .btn-start:hover { background-color: #0056b3; }
+        
+        .logout { color: red; cursor: pointer; border: 1px solid red; padding: 5px 10px; border-radius: 5px; background: white; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>👋 Hola, <span id="userName">Paciente</span></h1>
+        <button id="logoutBtn" class="logout">Salir</button>
+    </div>
+
+    <div class="container">
+        <h3>📅 Tus Ejercicios Pendientes</h3>
+        <div id="exercisesList">
+            <p>Cargando tus tareas...</p>
+        </div>
+    </div>
+
+    <script type="module" src="./js/paciente.js"></script>
+</body>
+</html>
