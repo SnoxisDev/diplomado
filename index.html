@@ -2,12 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Prueba de Conexión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - TeleRehab</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; }
+        .container { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 350px; }
+        input, select, button { width: 100%; margin: 10px 0; padding: 10px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+        .toggle-btn { background: none; color: #007bff; text-decoration: underline; border: none; font-size: 0.9em; }
+    </style>
 </head>
 <body>
-    <h1>Probando conexión a Firebase...</h1>
-    <p>Abre la consola del navegador (F12) para ver el resultado.</p>
 
-    <script type="module" src="./js/firebase-config.js"></script>
+    <div class="container">
+        <h2 id="formTitle">Iniciar Sesión</h2>
+        
+        <form id="authForm">
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
+            
+            <div id="registerFields" class="hidden">
+                <input type="text" id="nombre" placeholder="Nombre completo">
+                <select id="rol">
+                    <option value="paciente">Soy Paciente</option>
+                    <option value="doctor">Soy Fisioterapeuta</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn">Entrar</button>
+        </form>
+
+        <p id="msg" style="color: red; text-align: center;"></p>
+        
+        <button class="toggle-btn" id="toggleModeBtn">¿No tienes cuenta? Regístrate aquí</button>
+    </div>
+
+    <script type="module" src="./js/auth.js"></script>
 </body>
 </html>
