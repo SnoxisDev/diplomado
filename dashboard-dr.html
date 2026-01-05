@@ -1,1 +1,67 @@
-<h1>Bienvenido Doctor</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Doctor - TeleRehab</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos específicos para el panel */
+        body { background-color: #f4f6f9; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        
+        .patient-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; }
+        .patient-item:hover { background-color: #f0f8ff; }
+        .selected { background-color: #e3f2fd; font-weight: bold; border-left: 4px solid #007bff; }
+
+        button { padding: 10px 20px; cursor: pointer; }
+        .btn-logout { background-color: #dc3545; color: white; border: none; border-radius: 4px; }
+        .btn-assign { background-color: #28a745; color: white; border: none; width: 100%; margin-top: 10px; border-radius: 4px; }
+        
+        input, select { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; }
+        
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>👨‍⚕️ Panel de Fisioterapia</h1>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+    </div>
+
+    <div class="grid-container">
+        <div class="card">
+            <h3>1. Seleccionar Paciente</h3>
+            <div id="loadingPatients">Cargando pacientes...</div>
+            <div id="patientsList">
+                </div>
+        </div>
+
+        <div class="card">
+            <h3>2. Asignar Rutina</h3>
+            <p id="selectedPatientName" style="color: #666; font-style: italic;">Ningún paciente seleccionado</p>
+            
+            <form id="assignForm">
+                <label>Ejercicio:</label>
+                <select id="exerciseSelect">
+                    <option value="flexion_codo">Flexión de Codo (Bíceps)</option>
+                    <option value="sentadilla">Sentadilla (Squat)</option>
+                    <option value="elevacion_hombro">Elevación de Hombro</option>
+                </select>
+
+                <label>Repeticiones Meta:</label>
+                <input type="number" id="repsMeta" value="10" min="1" max="50">
+
+                <button type="submit" class="btn-assign" id="btnAssign" disabled>Asignar Ejercicio</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="./js/doctor.js"></script>
+</body>
+</html>
