@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor de Ejercicio - TeleRehab</title>
+    <style>
+        body { margin: 0; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: sans-serif; }
+        
+        .container { position: relative; width: 1280px; height: 720px; max-width: 100%; }
+        
+        /* El video de la cámara (oculto, solo usamos el canvas) */
+        .input_video { display: none; }
+        
+        /* El lienzo donde dibujamos el esqueleto */
+        .output_canvas { width: 100%; height: 100%; object-fit: contain; transform: scaleX(-1); /* Efecto espejo */ }
+        
+        .overlay { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; font-size: 1.2rem; }
+        
+        .btn-back { position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; z-index: 100; }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <button class="btn-back" onclick="window.history.back()">❌ Salir</button>
+
+    <div class="container">
+        <video class="input_video"></video>
+        <canvas class="output_canvas" width="1280" height="720"></canvas>
+        
+        <div class="overlay">
+            <div>Ejercicio: <strong id="lblExercise">Cargando...</strong></div>
+            <div>Repeticiones: <strong id="lblReps" style="font-size: 2rem; color: #00ff00;">0</strong></div>
+            <div id="feedback" style="color: yellow;">Ponte frente a la cámara</div>
+        </div>
+    </div>
+
+    <script type="module" src="./js/vision.js"></script>
+
+</body>
+</html>

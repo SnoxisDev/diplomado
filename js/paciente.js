@@ -49,7 +49,7 @@ async function loadAssignments(user) {
                 <p style="margin:5px 0; color:#666">Meta: <strong>${data.reps_meta} repeticiones</strong></p>
                 <small>Asignado: ${new Date(data.fecha.seconds * 1000).toLocaleDateString()}</small>
             </div>
-            <button class="btn-start" onclick="alert('Mañana conectamos la cámara para: ${nombreEj}')">
+            <button class="btn-start" onclick="window.location.href = 'monitor.html'">
                 ▶ COMENZAR
             </button>
         `;
