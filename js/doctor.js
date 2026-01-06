@@ -1,7 +1,6 @@
-// js/doctor.js - CÓDIGO COMPLETO Y CORREGIDO
 import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // VARIABLES GLOBALES
 let selectedPatientId = null; // Aquí guardamos a quién le vamos a asignar el ejercicio
@@ -92,6 +91,7 @@ window.responderSolicitud = async (reqId, respuesta) => {
 // --------------------------------------------------------
 // 2. CARGAR MIS PACIENTES (SOLO LOS ACEPTADOS)
 // --------------------------------------------------------
+// --- Reemplaza tu función loadMyPatients actual por esta ---
 async function loadMyPatients() {
     const list = document.getElementById('patientsList');
     if (!list) return;
@@ -106,45 +106,47 @@ async function loadMyPatients() {
         );
 
         const snapshot = await getDocs(q);
-        list.innerHTML = ""; // Limpiar para evitar duplicados
+        list.innerHTML = "";
 
         if (snapshot.empty) {
-            list.innerHTML = '<p style="padding:10px; color:#666">No tienes pacientes activos. Revisa la campana 🔔.</p>';
+            list.innerHTML = '<p style="padding:10px; color:#666">No tienes pacientes activos.</p>';
             return;
         }
 
         snapshot.forEach(docSnap => {
             const data = docSnap.data();
             const div = document.createElement('div');
-            // Estilos de la tarjeta de paciente
             div.className = 'patient-item'; 
-            div.style = "padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center;";
-            div.innerHTML = `
-                <div style="width:35px; height:35px; background:#007bff; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px; font-weight:bold;">
-                    ${data.nombre_paciente.charAt(0)}
-                </div>
-                <div>
-                    <strong>${data.nombre_paciente}</strong>
-                    <div style="font-size:0.8em; color:green;">● Activo</div>
-                </div>
+            div.style = "padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;";
+            
+            // Lado Izquierdo: Info del Paciente (Click para seleccionar)
+            const infoDiv = document.createElement('div');
+            infoDiv.style = "display:flex; align-items:center; cursor:pointer; flex-grow:1;";
+            infoDiv.innerHTML = `
+                <div style="width:35px; height:35px; background:#007bff; color:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-right:10px;">${data.nombre_paciente.charAt(0)}</div>
+                <div><strong>${data.nombre_paciente}</strong><div style="font-size:0.8em; color:green;">● Activo</div></div>
             `;
             
-            // Al hacer click, seleccionamos este paciente
-            div.onclick = () => {
-                selectedPatientId = data.id_paciente; // Guardamos el ID REAL del paciente
-                
-                // Efecto visual de selección
+            infoDiv.onclick = () => {
+                selectedPatientId = data.id_paciente;
                 document.querySelectorAll('.patient-item').forEach(el => el.style.background = 'none');
                 div.style.background = '#e3f2fd';
-
-                // Actualizar panel derecho
-                const labelName = document.getElementById('selectedPatientName');
-                const btnAssign = document.getElementById('btnAssign');
-                
-                if (labelName) labelName.innerHTML = `Paciente: <strong>${data.nombre_paciente}</strong>`;
-                if (btnAssign) btnAssign.disabled = false;
+                if(document.getElementById('selectedPatientName')) document.getElementById('selectedPatientName').innerHTML = `Paciente: <strong>${data.nombre_paciente}</strong>`;
+                if(document.getElementById('btnAssign')) document.getElementById('btnAssign').disabled = false;
             };
 
+            // Lado Derecho: Botón Eliminar (NUEVO)
+            const btnDelete = document.createElement('button');
+            btnDelete.innerHTML = "🗑️";
+            btnDelete.title = "Dejar de atender a este paciente";
+            btnDelete.style = "background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:10px;";
+            btnDelete.onclick = (e) => {
+                e.stopPropagation(); // Para que no seleccione al paciente al borrarlo
+                desvincularPaciente(docSnap.id, data.nombre_paciente); // Usamos el ID de la solicitud
+            };
+
+            div.appendChild(infoDiv);
+            div.appendChild(btnDelete);
             list.appendChild(div);
         });
 
@@ -152,6 +154,22 @@ async function loadMyPatients() {
         console.error("Error cargando pacientes:", error);
     }
 }
+
+// --- Agrega esta función nueva al final de tu archivo ---
+window.desvincularPaciente = async (reqId, nombre) => {
+    if(confirm(`¿Estás seguro de que ya NO quieres atender a ${nombre}? \nSe borrará de tu lista.`)) {
+        try {
+            await deleteDoc(doc(db, "requests", reqId));
+            alert("Paciente eliminado de tu lista.");
+            loadMyPatients(); // Recargar lista
+            // Limpiar selección
+            selectedPatientId = null;
+            document.getElementById('selectedPatientName').innerHTML = "Ningún paciente seleccionado";
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    }
+};
 
 // --------------------------------------------------------
 // 3. ASIGNAR EJERCICIO

@@ -1,20 +1,25 @@
 import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const directorySection = document.getElementById('directorySection');
 const exercisesSection = document.getElementById('exercisesSection');
 const doctorsList = document.getElementById('doctorsList');
 const exercisesList = document.getElementById('exercisesList');
 
-// 1. Verificar Estado del Paciente (CORREGIDO)
+// Verificar Estado del Paciente
 async function checkStatus(user) {
-    // Cargar nombre
+    // 1. Obtener nombre del paciente
     const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) document.getElementById('userName').innerText = userDoc.data().nombre;
+    let pacienteNombre = "Paciente";
+    if (userDoc.exists()) {
+        pacienteNombre = userDoc.data().nombre;
+    }
+    
+    // Ponemos el nombre por defecto
+    document.getElementById('userName').innerText = pacienteNombre;
 
-    // A. ¿YA TIENE DOCTOR ASIGNADO?
-    // Buscamos si existe una relación ACEPTADA o PENDIENTE en 'requests'
+    // 2. Buscar si tiene doctor (Aceptado o Pendiente)
     const q = query(
         collection(db, "requests"),
         where("id_paciente", "==", user.uid)
@@ -24,31 +29,49 @@ async function checkStatus(user) {
 
     let tieneDoctor = false;
     let doctorName = "";
+    let requestId = ""; // ID de la solicitud para poder borrarla luego
 
     snapshot.forEach(doc => {
         const data = doc.data();
         if (data.estado === 'aceptado') {
             tieneDoctor = true;
             doctorName = data.nombre_doctor;
+            requestId = doc.id;
         } else if (data.estado === 'pendiente') {
-            // Si está pendiente, tampoco le mostramos la lista, le decimos que espere
+            // Si está pendiente, le decimos que espere
             exercisesSection.style.display = 'block';
             directorySection.style.display = 'none';
-            exercisesList.innerHTML = `<div class="task-card" style="border-left:5px solid orange">
-                <h3>⏳ Solicitud Enviada</h3>
-                <p>Esperando a que el <strong>${data.nombre_doctor}</strong> te acepte.</p>
-            </div>`;
-            return; // Salimos, no cargamos nada más
+            exercisesList.innerHTML = `
+                <div class="task-card" style="border-left:5px solid orange">
+                    <h3>⏳ Solicitud Enviada</h3>
+                    <p>Esperando a que el <strong>${data.nombre_doctor}</strong> te acepte.</p>
+                    <button onclick="dejarDoctor('${doc.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-top:10px; text-decoration:underline;">
+                        (Cancelar solicitud)
+                    </button>
+                </div>`;
+            return; // Salimos de la función
         }
     });
 
     if (tieneDoctor) {
-        // CASO 1: YA TIENE DOCTOR -> CARGAR EJERCICIOS
+        // CASO 1: YA TIENE DOCTOR
+        // Actualizamos el título para mostrar quién lo atiende y el botón de cambiar
+        document.getElementById('userName').innerHTML = `
+            ${pacienteNombre} 
+            <br><small style="color:#666; font-size:0.6em; font-weight:normal;">
+                Atendido por: Dr. ${doctorName} 
+                <a href="#" onclick="dejarDoctor('${requestId}')" style="color:red; margin-left:10px; text-decoration:underline;">(Cambiar)</a>
+            </small>
+        `;
+
         directorySection.style.display = 'none';
         exercisesSection.style.display = 'block';
         loadAssignments(user);
+
+    } else if (exercisesList.innerHTML.includes("Solicitud Enviada")) {
+        // Si ya mostramos el mensaje de pendiente arriba, no hacemos nada más
     } else {
-        // CASO 2: NO TIENE DOCTOR -> MOSTRAR DIRECTORIO
+        // CASO 2: NO TIENE DOCTOR NI SOLICITUD -> MOSTRAR DIRECTORIO
         directorySection.style.display = 'block';
         exercisesSection.style.display = 'none';
         loadDoctors(user.uid);
@@ -164,3 +187,17 @@ auth.onAuthStateChanged(user => {
     if (user) checkStatus(user);
     else window.location.href = 'index.html';
 });
+
+// Función para borrar la relación con el doctor
+window.dejarDoctor = async (reqId) => {
+    if(confirm("¿Seguro que quieres dejar a este doctor o cancelar la solicitud?")) {
+        try {
+            await deleteDoc(doc(db, "requests", reqId));
+            alert("Listo. Ahora puedes elegir un nuevo doctor.");
+            window.location.reload();
+        } catch (e) {
+            console.error(e);
+            alert("Error: " + e.message);
+        }
+    }
+}
