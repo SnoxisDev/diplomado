@@ -43,16 +43,21 @@ async function loadAssignments(user) {
 
         const div = document.createElement('div');
         div.className = 'task-card';
-        div.innerHTML = `
-            <div>
-                <h3 style="margin:0">${nombreEj}</h3>
-                <p style="margin:5px 0; color:#666">Meta: <strong>${data.reps_meta} repeticiones</strong></p>
-                <small>Asignado: ${new Date(data.fecha.seconds * 1000).toLocaleDateString()}</small>
-            </div>
-            <button class="btn-start" onclick="window.location.href = 'monitor.html'">
-                ▶ COMENZAR
-            </button>
-        `;
+        // En js/paciente.js (dentro del bucle forEach)
+
+            // ... código anterior ...
+            div.innerHTML = `
+                <div>
+                    <h3 style="margin:0">${nombreEj}</h3>
+                    <p style="margin:5px 0; color:#666">Meta: <strong>${data.reps_meta} repeticiones</strong></p>
+                    <small>Asignado: ${new Date(data.fecha.seconds * 1000).toLocaleDateString()}</small>
+                </div>
+                
+                <button class="btn-start" onclick="irAlMonitor('${docSnap.id}', ${data.reps_meta}, '${data.tipo_ejercicio}')">
+                    ▶ COMENZAR
+                </button>
+            `;
+            // ... código posterior ...
         list.appendChild(div);
     });
 }
@@ -67,3 +72,8 @@ auth.onAuthStateChanged(user => {
         window.location.href = 'index.html';
     }
 });
+
+// Función global para redireccionar
+window.irAlMonitor = (id, meta, tipo) => {
+    window.location.href = `monitor.html?id=${id}&meta=${meta}&tipo=${tipo}`;
+}
