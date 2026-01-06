@@ -38,17 +38,28 @@
     </style>
 </head>
 <body>
-
     <div class="header">
         <h1>👋 Hola, <span id="userName">Paciente</span></h1>
         <button id="logoutBtn" class="logout">Salir</button>
     </div>
 
     <div class="container">
-        <h3>📅 Tus Ejercicios Pendientes</h3>
-        <div id="exercisesList">
-            <p>Cargando tus tareas...</p>
+        
+        <div id="directorySection" style="display: none;">
+            <h3>👨‍⚕️ Encuentra a tu Especialista</h3>
+            <p>Selecciona un fisioterapeuta para comenzar tu tratamiento.</p>
+            <div id="doctorsList" class="doctors-grid">
+                <p>Cargando especialistas...</p>
+            </div>
         </div>
+
+        <div id="exercisesSection">
+            <h3>📅 Tus Ejercicios Pendientes</h3>
+            <div id="exercisesList">
+                <p>Cargando tus tareas...</p>
+            </div>
+        </div>
+
     </div>
 
     <script type="module" src="./js/paciente.js"></script>
