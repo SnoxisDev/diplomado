@@ -1,51 +1,170 @@
-/* Estilos para el Directorio de Doctores */
-.doctors-grid {
+/* css/styles.css - DISEÑO PROFESIONAL DARK MODE */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+    /* Paleta de Colores "MediDark" */
+    --bg-main: #0f172a;       /* Fondo muy oscuro (casi negro) */
+    --bg-card: #1e293b;       /* Fondo de tarjetas (gris azulado oscuro) */
+    --bg-hover: #334155;      /* Color al pasar el mouse */
+    --text-main: #f8fafc;     /* Blanco brillante */
+    --text-muted: #94a3b8;    /* Gris suave para textos secundarios */
+    
+    --primary: #3b82f6;       /* Azul Médico Brillante */
+    --primary-hover: #2563eb;
+    --success: #10b981;       /* Verde Esmeralda */
+    --danger: #ef4444;        /* Rojo Alerta */
+    --warning: #f59e0b;       /* Naranja Pendiente */
+
+    --border: #334155;        /* Bordes sutiles */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif; /* Fuente moderna */
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* --- HEADER / BARRA SUPERIOR --- */
+.header {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+h1 { font-size: 1.5rem; margin: 0; font-weight: 700; color: var(--text-main); }
+h2, h3 { color: var(--text-main); }
+
+/* --- CONTENEDORES --- */
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+.grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
 }
 
-.doctor-card {
-    background: white;
-    border-radius: 12px;
+/* --- TARJETAS (CARDS) --- */
+.card, .doctor-card, .task-card, .patient-item, .card-guide {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
     padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
-    border: 1px solid #eee;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: var(--text-main);
 }
 
-.doctor-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+.card:hover, .doctor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
+    border-color: var(--primary);
+}
+
+/* --- BOTONES --- */
+button, .btn, .btn-primary, .btn-assign, .btn-request, .btn-start {
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Estilos específicos de botones */
+.btn-assign, .btn-primary { background-color: var(--primary); color: white; }
+.btn-assign:hover { background-color: var(--primary-hover); }
+
+.btn-logout { 
+    background-color: transparent; 
+    border: 1px solid var(--danger); 
+    color: var(--danger); 
+}
+.btn-logout:hover { background-color: var(--danger); color: white; }
+
+/* --- INPUTS Y SELECTS --- */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: #0f172a; /* Fondo oscuro */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 15px;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* --- TABLAS --- */
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th { background-color: #334155; color: white; padding: 12px; text-align: left; border-radius: 4px; }
+td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+tr:hover td { background-color: var(--bg-hover); color: white; }
+
+/* --- ELEMENTOS ESPECÍFICOS --- */
+.selected {
+    background-color: rgba(59, 130, 246, 0.2) !important; /* Azul transparente */
+    border-left: 4px solid var(--primary) !important;
 }
 
 .doc-avatar {
-    width: 80px;
-    height: 80px;
-    background-color: #e3f2fd;
-    color: #007bff;
+    width: 70px; height: 70px;
+    background: var(--bg-hover);
     border-radius: 50%;
-    font-size: 30px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; margin: 0 auto 15px auto;
+    border: 2px solid var(--primary);
+}
+
+/* --- NOTIFICACIONES --- */
+#requestsContainer {
+    background-color: rgba(245, 158, 11, 0.1) !important; /* Naranja transparente */
+    border: 1px solid var(--warning) !important;
+    color: var(--warning);
+}
+#notificationBadge { background-color: var(--danger); }
+#dropdownMenu {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-main);
+}
+
+/* --- LOGIN SCREEN --- */
+.login-container {
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 15px auto;
-    font-weight: bold;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
 }
-
-.btn-request {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
+.login-box {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     width: 100%;
-    margin-top: 10px;
+    max-width: 400px;
+    text-align: center;
+    border: 1px solid var(--border);
 }
-
-.btn-request:hover { background-color: #0056b3; }
-.btn-request:disabled { background-color: #ccc; cursor: not-allowed; }

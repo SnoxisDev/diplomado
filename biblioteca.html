@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Ejercicios - TeleRehab</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+        
+        .header-guide { text-align: center; margin-bottom: 40px; }
+        .header-guide h1 { color: #2c3e50; margin-bottom: 10px; }
+        .header-guide p { color: #7f8c8d; max-width: 600px; margin: 0 auto; }
+
+        .grid-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card-guide {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .card-guide:hover { transform: translateY(-5px); }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .card-body { padding: 20px; }
+        .badge { 
+            background: #e3f2fd; color: #007bff; 
+            padding: 5px 10px; border-radius: 20px; 
+            font-size: 0.8rem; font-weight: bold; 
+            text-transform: uppercase;
+        }
+
+        h3 { margin: 15px 0 10px 0; color: #34495e; }
+        p { color: #666; line-height: 1.6; font-size: 0.95rem; }
+
+        .tips {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .btn-back {
+            position: fixed; top: 20px; left: 20px;
+            background: #2c3e50; color: white;
+            padding: 10px 20px; border-radius: 30px;
+            text-decoration: none; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="dashboard-paciente.html" class="btn-back">⬅ Volver</a>
+
+    <div class="header-guide">
+        <h1>📚 Biblioteca de Ejercicios</h1>
+        <p>Aprende la técnica correcta antes de iniciar tu sesión con la Inteligencia Artificial.</p>
+    </div>
+
+    <div class="grid-guide">
+        
+        <div class="card-guide">
+            <img src="https://placehold.co/600x400/007bff/ffffff?text=Flexion+Codo" class="card-img" alt="Biceps">
+            <div class="card-body">
+                <span class="badge">Tren Superior</span>
+                <h3>Flexión de Codo (Bíceps)</h3>
+                <p>Ejercicio fundamental para recuperar la fuerza en el brazo y mejorar la movilidad del codo tras una lesión.</p>
+                
+                <div class="tips">
+                    <strong>💡 Tip IA:</strong> Colócate de frente a la cámara. Extiende el brazo completamente hasta que el contador marque "Abajo".
+                </div>
+            </div>
+        </div>
+
+        <div class="card-guide">
+            <img src="https://placehold.co/600x400/28a745/ffffff?text=Sentadilla" class="card-img" alt="Squat">
+            <div class="card-body">
+                <span class="badge">Tren Inferior</span>
+                <h3>Sentadilla (Squat)</h3>
+                <p>Fortalece piernas y glúteos. Es vital mantener la espalda recta y bajar controladamente.</p>
+                
+                <div class="tips">
+                    <strong>💡 Tip IA:</strong> Ponte de PERFIL (de lado) a la cámara y aléjate 2 metros para que veamos tu cuerpo completo.
+                </div>
+            </div>
+        </div>
+
+        <div class="card-guide">
+            <img src="https://placehold.co/600x400/6c757d/ffffff?text=Hombro" class="card-img" alt="Hombro">
+            <div class="card-body">
+                <span class="badge">Rehabilitación</span>
+                <h3>Elevación de Hombro</h3>
+                <p>Próximamente disponible. Diseñado para lesiones del manguito rotador.</p>
+                
+                <div class="tips">
+                    <strong>🔒 Bloqueado:</strong> Este ejercicio aún no ha sido asignado por tu doctor.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
