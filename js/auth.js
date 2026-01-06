@@ -2,51 +2,64 @@ import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Referencias al HTML
+// Referencias al HTML (Adaptadas al Nuevo Diseño)
 const authForm = document.getElementById('authForm');
-const toggleBtn = document.getElementById('toggleModeBtn');
-const registerFields = document.getElementById('registerFields');
-const title = document.getElementById('formTitle');
-const btnLabel = document.getElementById('submitBtn');
-const msg = document.getElementById('msg');
+const toggleBtn = document.getElementById('toggleBtn');     // Enlace de texto abajo
+const toggleText = document.getElementById('toggleText');   // Texto "¿No tienes cuenta?"
+const registerFields = document.getElementById('registerFields'); // Campos extra
 
-let isRegistering = false; // Variable para saber si estamos logueando o registrando
+let isRegistering = false; 
 
-// 1. Alternar entre Login y Registro
-toggleBtn.addEventListener('click', () => {
+// 1. ALTERNAR MODO (Login <-> Registro)
+toggleBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // Evita que el enlace recargue la página
     isRegistering = !isRegistering;
+
+    const btnSubmit = authForm.querySelector('button'); // El botón principal
+
     if (isRegistering) {
-        registerFields.classList.remove('hidden');
-        title.innerText = "Crear Cuenta Nueva";
-        btnLabel.innerText = "Registrarse";
-        toggleBtn.innerText = "¿Ya tienes cuenta? Inicia Sesión";
+        // MODO REGISTRO
+        registerFields.style.display = 'block'; // Mostrar campos
+        toggleText.innerText = "¿Ya tienes cuenta?";
+        toggleBtn.innerText = "Inicia Sesión aquí";
+        // Cambiar botón con icono de FontAwesome
+        btnSubmit.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Cuenta';
     } else {
-        registerFields.classList.add('hidden');
-        title.innerText = "Iniciar Sesión";
-        btnLabel.innerText = "Entrar";
-        toggleBtn.innerText = "¿No tienes cuenta? Regístrate aquí";
+        // MODO LOGIN
+        registerFields.style.display = 'none'; // Ocultar campos
+        toggleText.innerText = "¿No tienes cuenta?";
+        toggleBtn.innerText = "Regístrate aquí";
+        // Cambiar botón con icono de FontAwesome
+        btnSubmit.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
     }
 });
 
-// 2. Manejar el envío del formulario
+// 2. MANEJAR ENVÍO
 authForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Evita que la página se recargue
-    msg.innerText = "Procesando...";
-
+    e.preventDefault();
+    
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const btnSubmit = authForm.querySelector('button');
+
+    // Feedback visual (Cargando...)
+    const originalText = btnSubmit.innerHTML;
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
 
     try {
         if (isRegistering) {
-            // --- LÓGICA DE REGISTRO ---
+            // --- REGISTRO ---
             const nombre = document.getElementById('nombre').value;
             const rol = document.getElementById('rol').value;
 
-            // A. Crear usuario en Authentication
+            if(!nombre) throw new Error("El nombre es obligatorio");
+
+            // Crear usuario
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // B. Guardar datos extra en Firestore (Base de datos)
+            // Guardar en Firestore
             await setDoc(doc(db, "users", user.uid), {
                 nombre: nombre,
                 email: email,
@@ -54,35 +67,48 @@ authForm.addEventListener('submit', async (e) => {
                 fecha_registro: new Date()
             });
 
-            alert("Usuario creado con éxito. Ahora inicia sesión.");
-            // Recargar para limpiar campos
-            window.location.reload(); 
+            alert(`✅ ¡Bienvenido, ${nombre}!`);
+            redirigir(rol);
 
         } else {
-            // --- LÓGICA DE LOGIN ---
+            // --- LOGIN ---
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // C. Consultar qué rol tiene el usuario en la base de datos
-            const docRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(docRef);
-
+            // Buscar rol
+            const docSnap = await getDoc(doc(db, "users", user.uid));
+            
             if (docSnap.exists()) {
-                const userData = docSnap.data();
-                msg.innerText = `Bienvenido, ${userData.nombre}`;
-                
-                // D. Redireccionar según el rol
-                if (userData.rol === 'doctor') {
-                    window.location.href = 'dashboard-dr.html';
-                } else {
-                    window.location.href = 'dashboard-paciente.html';
-                }
+                const data = docSnap.data();
+                redirigir(data.rol);
             } else {
-                msg.innerText = "Error: Usuario sin datos en Firestore.";
+                alert("Error: Usuario sin datos.");
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalText;
             }
         }
     } catch (error) {
         console.error(error);
-        msg.innerText = "Error: " + error.message;
+        
+        // Mensajes de error amigables
+        let msg = error.message;
+        if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
+        if (error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
+        if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil (mínimo 6 caracteres).";
+
+        alert("❌ " + msg);
+        
+        // Restaurar botón
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = originalText;
     }
 });
+
+// Función simple para mover al usuario
+function redirigir(rol) {
+    if (rol === 'doctor') {
+        window.location.href = 'dashboard-dr.html';
+    } else {
+        window.location.href = 'dashboard-paciente.html';
+    }
+}

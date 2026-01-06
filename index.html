@@ -3,41 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso - TeleRehab</title>
+    <title>TeleRehab - Login</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; }
-        .container { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 350px; }
-        input, select, button { width: 100%; margin: 10px 0; padding: 10px; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-        .hidden { display: none; }
-        .toggle-btn { background: none; color: #007bff; text-decoration: underline; border: none; font-size: 0.9em; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="container">
-        <h2 id="formTitle">Iniciar Sesión</h2>
-        
-        <form id="authForm">
-            <input type="email" id="email" placeholder="Correo electrónico" required>
-            <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
-            
-            <div id="registerFields" class="hidden">
-                <input type="text" id="nombre" placeholder="Nombre completo">
-                <select id="rol">
-                    <option value="paciente">Soy Paciente</option>
-                    <option value="doctor">Soy Fisioterapeuta</option>
-                </select>
+    <div class="login-container">
+        <div class="login-box">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
+                <i class="fa-solid fa-heart-pulse"></i>
             </div>
+            
+            <h1 style="margin-bottom: 10px;">TeleRehab AI</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Plataforma de Rehabilitación Inteligente</p>
 
-            <button type="submit" id="submitBtn">Entrar</button>
-        </form>
+            <form id="authForm">
+                <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Correo Electrónico</div>
+                <input type="email" id="email" placeholder="usuario@ejemplo.com" required>
 
-        <p id="msg" style="color: red; text-align: center;"></p>
-        
-        <button class="toggle-btn" id="toggleModeBtn">¿No tienes cuenta? Regístrate aquí</button>
+                <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Contraseña</div>
+                <input type="password" id="password" placeholder="••••••••" required>
+
+                <div id="registerFields" style="display: none;">
+                    <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Nombre Completo</div>
+                    <input type="text" id="nombre" placeholder="Tu nombre real">
+
+                    <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Rol</div>
+                    <select id="rol">
+                        <option value="paciente">Soy Paciente 🤕</option>
+                        <option value="doctor">Soy Fisioterapeuta 👨‍⚕️</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px; padding: 15px;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                <span id="toggleText">¿No tienes cuenta?</span> 
+                <a href="#" id="toggleBtn" style="color: var(--primary); font-weight: bold;">Regístrate aquí</a>
+            </p>
+        </div>
     </div>
 
     <script type="module" src="./js/auth.js"></script>
