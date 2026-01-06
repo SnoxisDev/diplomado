@@ -63,6 +63,27 @@
         </div>
     </div>
 
+    <div class="card" style="margin-top: 20px;">
+        <h3>📊 Historial de Ejercicios Completados</h3>
+        <button id="btnRefreshHistory" style="background: #6c757d; color: white; border: none; padding: 5px 10px; cursor: pointer;">🔄 Actualizar</button>
+        
+        <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background: #eee;">
+                    <th>Paciente</th>
+                    <th>Ejercicio</th>
+                    <th>Reps</th>
+                    <th>Fecha</th>
+                    <th>PDF</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody">
+                </tbody>
+        </table>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script type="module" src="./js/doctor.js"></script>
 </body>
 </html>
