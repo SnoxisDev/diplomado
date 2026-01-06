@@ -5,106 +5,58 @@ import { collection, query, where, getDocs, addDoc, doc, getDoc } from "https://
 const directorySection = document.getElementById('directorySection');
 const exercisesSection = document.getElementById('exercisesSection');
 const doctorsList = document.getElementById('doctorsList');
+const exercisesList = document.getElementById('exercisesList');
 
-// 1. Cerrar Sesión
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    signOut(auth).then(() => window.location.href = 'index.html');
-});
-
-// 2. Verificar Estado del Paciente
+// 1. Verificar Estado del Paciente (CORREGIDO)
 async function checkStatus(user) {
-    // Ponemos el nombre
+    // Cargar nombre
     const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
-        document.getElementById('userName').innerText = userDoc.data().nombre;
-    }
+    if (userDoc.exists()) document.getElementById('userName').innerText = userDoc.data().nombre;
 
-    // Buscamos si ya tiene doctor asignado (Buscamos en una coleccion 'connections')
-    // OJO: Para hacerlo simple hoy, vamos a asumir que si NO tiene ejercicios, le mostramos doctores.
-    // Pero lo correcto es buscar solicitudes.
+    // A. ¿YA TIENE DOCTOR ASIGNADO?
+    // Buscamos si existe una relación ACEPTADA o PENDIENTE en 'requests'
+    const q = query(
+        collection(db, "requests"),
+        where("id_paciente", "==", user.uid)
+    );
     
-    // Paso A: Cargar Doctores Disponibles
-    loadDoctors(user.uid);
-    
-    // Paso B: Cargar Ejercicios (si los tiene)
-    loadAssignments(user);
-}
+    const snapshot = await getDocs(q);
 
-// 3. Cargar Lista de Doctores (Directorio)
-async function loadDoctors(patientId) {
-    directorySection.style.display = 'block'; // Mostramos el directorio
-    doctorsList.innerHTML = '';
+    let tieneDoctor = false;
+    let doctorName = "";
 
-    try {
-        // Buscar todos los usuarios que sean DOCTORES
-        const q = query(collection(db, "users"), where("rol", "==", "doctor"));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-            doctorsList.innerHTML = "<p>No hay doctores registrados en la plataforma.</p>";
-            return;
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.estado === 'aceptado') {
+            tieneDoctor = true;
+            doctorName = data.nombre_doctor;
+        } else if (data.estado === 'pendiente') {
+            // Si está pendiente, tampoco le mostramos la lista, le decimos que espere
+            exercisesSection.style.display = 'block';
+            directorySection.style.display = 'none';
+            exercisesList.innerHTML = `<div class="task-card" style="border-left:5px solid orange">
+                <h3>⏳ Solicitud Enviada</h3>
+                <p>Esperando a que el <strong>${data.nombre_doctor}</strong> te acepte.</p>
+            </div>`;
+            return; // Salimos, no cargamos nada más
         }
+    });
 
-        snapshot.forEach(docSnap => {
-            const drData = docSnap.data();
-            const drId = docSnap.id;
-
-            // Crear Tarjeta
-            const card = document.createElement('div');
-            card.className = 'doctor-card';
-            card.innerHTML = `
-                <div class="doc-avatar">Dr</div>
-                <h3>${drData.nombre}</h3>
-                <p style="color:#666; font-size:0.9em;">Fisioterapeuta Certificado</p>
-                <button class="btn-request" onclick="enviarSolicitud('${drId}', '${drData.nombre}')" id="btn-${drId}">
-                    Solicitar Atención
-                </button>
-            `;
-            doctorsList.appendChild(card);
-        });
-
-    } catch (error) {
-        console.error("Error cargando doctores:", error);
+    if (tieneDoctor) {
+        // CASO 1: YA TIENE DOCTOR -> CARGAR EJERCICIOS
+        directorySection.style.display = 'none';
+        exercisesSection.style.display = 'block';
+        loadAssignments(user);
+    } else {
+        // CASO 2: NO TIENE DOCTOR -> MOSTRAR DIRECTORIO
+        directorySection.style.display = 'block';
+        exercisesSection.style.display = 'none';
+        loadDoctors(user.uid);
     }
 }
 
-// 4. Función Global para Enviar Solicitud
-window.enviarSolicitud = async (doctorId, doctorName) => {
-    const btn = document.getElementById(`btn-${doctorId}`);
-    const patientId = auth.currentUser.uid;
-    const patientName = document.getElementById('userName').innerText;
-
-    if(!confirm(`¿Quieres enviar una solicitud al ${doctorName}?`)) return;
-
-    btn.innerText = "Enviando...";
-    btn.disabled = true;
-
-    try {
-        // Guardamos en la colección 'requests'
-        await addDoc(collection(db, "requests"), {
-            id_doctor: doctorId,
-            nombre_doctor: doctorName,
-            id_paciente: patientId,
-            nombre_paciente: patientName,
-            estado: "pendiente", // pendiente, aceptado, rechazado
-            fecha: new Date()
-        });
-
-        alert("✅ Solicitud enviada. Espera a que el doctor te acepte.");
-        btn.innerText = "Solicitud Enviada";
-
-    } catch (error) {
-        console.error(error);
-        alert("Error: " + error.message);
-        btn.disabled = false;
-        btn.innerText = "Solicitar Atención";
-    }
-};
-
-// 5. Cargar Ejercicios (Igual que antes, pero verificando visibilidad)
+// 2. Cargar Ejercicios
 async function loadAssignments(user) {
-    const list = document.getElementById('exercisesList');
-    
     const q = query(
         collection(db, "assignments"), 
         where("id_paciente", "==", user.uid),
@@ -112,40 +64,102 @@ async function loadAssignments(user) {
     );
 
     const snapshot = await getDocs(q);
-    list.innerHTML = "";
+    exercisesList.innerHTML = "";
 
     if (snapshot.empty) {
-        list.innerHTML = "<p>No tienes ejercicios activos. Busca un doctor arriba.</p>";
+        // AQUÍ ESTABA EL ERROR ANTES. Ahora le decimos que espere, no que busque otro doctor.
+        exercisesList.innerHTML = `
+            <div style="text-align:center; padding:40px;">
+                <h2>🎉 ¡Todo al día!</h2>
+                <p>No tienes ejercicios pendientes por ahora.</p>
+                <p>Tu fisioterapeuta te enviará nuevas rutinas pronto.</p>
+            </div>
+        `;
         return;
     }
-    
-    // Si tiene ejercicios, ocultamos el directorio para que se enfoque en trabajar
-    directorySection.style.display = 'none'; 
-    exercisesSection.style.display = 'block';
 
     snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const nombreEj = data.tipo_ejercicio.replace('_', ' ').toUpperCase();
         
         const div = document.createElement('div');
-        div.className = 'task-card'; // Asegurate de tener este estilo en css
-        div.style = "background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #ffc107; display: flex; justify-content: space-between; align-items: center;";
+        div.className = 'task-card';
+        // Estilos inline para asegurar diseño sin CSS extra
+        div.style = "background: white; padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;";
         
         div.innerHTML = `
             <div>
-                <h3 style="margin:0">${nombreEj}</h3>
-                <small>Meta: ${data.reps_meta} reps</small>
+                <h3 style="margin:0; color:#333;">${nombreEj}</h3>
+                <p style="margin:5px 0; color:#666">Meta: <strong>${data.reps_meta} repeticiones</strong></p>
             </div>
             <button onclick="window.location.href='monitor.html?id=${docSnap.id}&meta=${data.reps_meta}&tipo=${data.tipo_ejercicio}'" 
-                style="background:#007bff; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">
-                ▶ INICIAR
+                style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                ▶ COMENZAR
             </button>
         `;
-        list.appendChild(div);
+        exercisesList.appendChild(div);
     });
 }
 
-// Iniciar
+// 3. Cargar Doctores
+async function loadDoctors() {
+    doctorsList.innerHTML = '<p>Cargando especialistas...</p>';
+    
+    // Solo mostramos doctores si NO hay relación activa (manejado por checkStatus)
+    try {
+        const q = query(collection(db, "users"), where("rol", "==", "doctor"));
+        const snapshot = await getDocs(q);
+        doctorsList.innerHTML = "";
+
+        snapshot.forEach(docSnap => {
+            const drData = docSnap.data();
+            const card = document.createElement('div');
+            card.className = 'doctor-card'; // Clase CSS del día anterior
+            card.innerHTML = `
+                <div class="doc-avatar" style="margin: 0 auto 15px auto;">Dr</div>
+                <h3>${drData.nombre}</h3>
+                <button class="btn-request" onclick="enviarSolicitud('${docSnap.id}', '${drData.nombre}')">Solicitar Atención</button>
+            `;
+            doctorsList.appendChild(card);
+        });
+    } catch (e) { console.error(e); }
+}
+
+// 4. Enviar Solicitud (CON ANTI-DUPLICADO)
+window.enviarSolicitud = async (doctorId, doctorName) => {
+    const patientId = auth.currentUser.uid;
+    const patientName = document.getElementById('userName').innerText;
+
+    if(!confirm(`¿Enviar solicitud al ${doctorName}?`)) return;
+
+    // VERIFICACIÓN DOBLE: Verificar si ya existe solicitud antes de crearla
+    // (Aunque checkStatus ayuda, esto es seguridad extra)
+    const q = query(collection(db, "requests"), where("id_paciente", "==", patientId), where("id_doctor", "==", doctorId));
+    const snap = await getDocs(q);
+    
+    if(!snap.empty) {
+        alert("⚠️ Ya tienes una solicitud pendiente o activa con este doctor.");
+        window.location.reload();
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "requests"), {
+            id_doctor: doctorId, nombre_doctor: doctorName,
+            id_paciente: patientId, nombre_paciente: patientName,
+            estado: "pendiente", fecha: new Date()
+        });
+        alert("Solicitud enviada exitosamente.");
+        window.location.reload(); // Recargar para que checkStatus actualice la vista
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
+
+// Cerrar sesión
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
+
+// Init
 auth.onAuthStateChanged(user => {
     if (user) checkStatus(user);
     else window.location.href = 'index.html';
