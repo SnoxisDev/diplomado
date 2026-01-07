@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - TeleRehab</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header">
+        <button id="btnBack" class="btn" style="background: transparent; border: 1px solid var(--border); color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </button>
+        <h1>Editar Perfil</h1>
+    </div>
+
+    <div class="container" style="max-width: 600px;">
+        
+        <div class="card">
+            <div style="text-align: center; margin-bottom: 30px;">
+               <div id="avatarPreview" style="width: 100px; height: 100px; background: var(--primary); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; border: 3px solid var(--bg-card); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); overflow: hidden;"></div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Tu foto pública</p>
+            </div>
+
+            <form id="profileForm">
+                
+                <label style="font-size: 0.8rem; color: var(--text-muted);">URL de tu Foto (Opcional)</label>
+                <input type="url" id="photoUrl" placeholder="https://ejemplo.com/mifoto.jpg">
+
+                <label style="font-size: 0.8rem; color: var(--text-muted);">Nombre Completo</label>
+                <input type="text" id="nombre" required>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Cédula / DNI</label>
+                        <input type="number" id="cedula" placeholder="Ej: 12345678">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Teléfono (con código país)</label>
+                        <input type="tel" id="telefono" placeholder="Ej: 584141234567">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Fecha Nacimiento</label>
+                        <input type="date" id="fechaNacimiento">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Género</label>
+                        <select id="genero">
+                            <option value="no_especificado">Prefiero no decir</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.8rem; color: var(--text-muted);">Correo Electrónico (No editable)</label>
+                <input type="email" id="email" disabled style="background: rgba(255,255,255,0.05); color: #666; cursor: not-allowed;">
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+
+    <script type="module" src="./js/perfil.js"></script>
+</body>
+</html>
