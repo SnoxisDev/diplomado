@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc, dele
 
 // VARIABLES GLOBALES
 let selectedPatientId = null;
-let chartInstance = null; // Para guardar la referencia del gráfico y poder actualizarlo
+let chartInstance = null;
 
 // ELEMENTOS DOM
 const bellBtn = document.getElementById('bellBtn');
@@ -12,23 +12,21 @@ const dropdown = document.getElementById('dropdownMenu');
 const badge = document.getElementById('notificationBadge');
 const reqList = document.getElementById('requestsList');
 const logoutBtn = document.getElementById('logoutBtn');
-const ctx = document.getElementById('patientChart').getContext('2d'); // El lienzo del gráfico
+const ctx = document.getElementById('patientChart').getContext('2d');
 
-// --------------------------------------------------------
-// 1. INICIALIZAR GRÁFICO VACÍO
-// --------------------------------------------------------
+// 1. INICIALIZAR GRÁFICO
 function initChart() {
     chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'], // Placeholder
+            labels: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue'],
             datasets: [{
                 label: 'Repeticiones Logradas',
                 data: [0, 0, 0, 0, 0],
-                borderColor: '#3b82f6', // Azul neón
+                borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 borderWidth: 2,
-                tension: 0.4, // Curvas suaves
+                tension: 0.4,
                 pointBackgroundColor: '#ffffff',
                 fill: true
             }]
@@ -36,70 +34,48 @@ function initChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#94a3b8' } }
-            },
+            plugins: { legend: { labels: { color: '#94a3b8' } } },
             scales: {
-                y: { 
-                    beginAtZero: true,
-                    grid: { color: '#334155' },
-                    ticks: { color: '#94a3b8' }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#94a3b8' }
-                }
+                y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
             }
         }
     });
 }
-initChart(); // Arrancar gráfico vacío al inicio
+initChart();
 
-// --------------------------------------------------------
-// 2. FUNCIÓN PARA ACTUALIZAR EL GRÁFICO CON DATOS REALES
-// --------------------------------------------------------
+// 2. ACTUALIZAR GRÁFICO
 async function updateChartData(patientId) {
-    // 1. Buscar historial completado de este paciente
     const q = query(
         collection(db, "assignments"),
         where("id_paciente", "==", patientId),
         where("estado", "==", "completado"),
-        orderBy("fecha_completado", "asc"), // Ordenar por fecha
-        limit(10) // Solo los últimos 10 ejercicios
+        orderBy("fecha_completado", "asc"),
+        limit(10)
     );
 
     const snapshot = await getDocs(q);
-    
     let fechas = [];
     let valores = [];
 
     if (snapshot.empty) {
-        // Si no hay datos, mostrar vacío
-        fechas = ["Sin datos"];
-        valores = [0];
+        fechas = ["Sin datos"]; valores = [0];
     } else {
         snapshot.forEach(doc => {
             const data = doc.data();
-            // Convertir fecha de Firestore a texto corto (Ej: 12/05)
             const dateObj = data.fecha_completado.toDate();
             const fechaCorta = `${dateObj.getDate()}/${dateObj.getMonth() + 1}`;
-            
             fechas.push(fechaCorta);
             valores.push(data.reps_realizadas);
         });
     }
 
-    // 2. Actualizar el gráfico existente
     chartInstance.data.labels = fechas;
     chartInstance.data.datasets[0].data = valores;
     chartInstance.update();
 }
 
-
-// --------------------------------------------------------
-// 3. LOGICA DE INTERFAZ (Campana, Listas, etc)
-// --------------------------------------------------------
-
+// 3. INTERFAZ Y SOLICITUDES
 if (bellBtn) {
     bellBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -108,7 +84,6 @@ if (bellBtn) {
 }
 document.addEventListener('click', () => { if(dropdown) dropdown.style.display = 'none'; });
 
-// Cargar Solicitudes
 async function loadIncomingRequests() {
     if (!reqList) return;
     const q = query(collection(db, "requests"), where("id_doctor", "==", auth.currentUser.uid), where("estado", "==", "pendiente"));
@@ -140,7 +115,7 @@ window.responderSolicitud = async (reqId, respuesta) => {
     loadIncomingRequests(); loadMyPatients();
 };
 
-// Cargar Pacientes
+// 4. CARGAR PACIENTES (CON FOTOS REALES)
 async function loadMyPatients() {
     const list = document.getElementById('patientsList');
     list.innerHTML = 'Cargando...';
@@ -149,37 +124,59 @@ async function loadMyPatients() {
     const snapshot = await getDocs(q);
     list.innerHTML = "";
 
-    if (snapshot.empty) { list.innerHTML = '<p style="padding:10px; color:#64748b">Sin pacientes.</p>'; return; }
+    if (snapshot.empty) { list.innerHTML = '<p style="padding:10px; color:#64748b">Sin pacientes activos.</p>'; return; }
 
-    snapshot.forEach(docSnap => {
+    snapshot.forEach(async (docSnap) => {
         const data = docSnap.data();
         const div = document.createElement('div');
         div.className = 'patient-item'; 
-        div.style = "padding: 10px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; transition: background 0.2s;";
+        div.style = "padding: 10px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; cursor: pointer;";
+        
+        const avatarId = `avatar-${data.id_paciente}`;
         
         div.innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                <div style="width:30px; height:30px; background:#3b82f6; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:bold;">${data.nombre_paciente.charAt(0)}</div>
-                <span>${data.nombre_paciente}</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div id="${avatarId}" style="width:40px; height:40px; background:#3b82f6; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:bold; color:white; overflow:hidden;">
+                    ${data.nombre_paciente.charAt(0)}
+                </div>
+                <div>
+                    <div style="font-weight:bold;">${data.nombre_paciente}</div>
+                    <div style="font-size:0.8rem; color:#10b981;">● Activo</div>
+                </div>
             </div>
-            <i class="fa-solid fa-trash" style="color:#ef4444; cursor:pointer;" onclick="desvincular('${docSnap.id}')"></i>
+            <i class="fa-solid fa-trash" style="color:#ef4444; padding:10px;" onclick="event.stopPropagation(); desvincular('${docSnap.id}')" title="Dejar de atender"></i>
         `;
-        
-        // AL HACER CLICK EN EL PACIENTE
-        div.querySelector('div').onclick = () => {
+
+        div.onclick = () => {
             selectedPatientId = data.id_paciente;
             document.querySelectorAll('.patient-item').forEach(el => el.style.background = 'transparent');
             div.style.background = 'rgba(59, 130, 246, 0.1)';
             
-            document.getElementById('selectedPatientName').innerHTML = `
-                <i class="fa-solid fa-user-check"></i> Paciente: <strong>${data.nombre_paciente}</strong>
-            `;
-            document.getElementById('btnAssign').disabled = false;
+            const currentAvatarHTML = document.getElementById(avatarId).innerHTML;
+            const isImage = currentAvatarHTML.includes('<img');
+            
+            const headerHTML = isImage 
+                ? `<div style="display:flex; align-items:center; gap:10px;"><div style="width:40px; height:40px; border-radius:50%; overflow:hidden;">${currentAvatarHTML}</div><span>Paciente: <strong>${data.nombre_paciente}</strong></span></div>`
+                : `<i class="fa-solid fa-user-check"></i> Paciente: <strong>${data.nombre_paciente}</strong>`;
 
-            // *** AQUÍ OCURRE LA MAGIA DEL GRÁFICO ***
+            document.getElementById('selectedPatientName').innerHTML = headerHTML;
+            document.getElementById('btnAssign').disabled = false;
             updateChartData(selectedPatientId); 
         };
+
         list.appendChild(div);
+
+        // Buscar foto real en segundo plano
+        try {
+            const userSnap = await getDoc(doc(db, "users", data.id_paciente));
+            if (userSnap.exists() && userSnap.data().photoUrl) {
+                const avatarDiv = document.getElementById(avatarId);
+                if (avatarDiv) {
+                    avatarDiv.style.background = 'transparent';
+                    avatarDiv.innerHTML = `<img src="${userSnap.data().photoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+            }
+        } catch (e) {}
     });
 }
 
@@ -187,11 +184,18 @@ window.desvincular = async (id) => {
     if(confirm("¿Eliminar paciente?")) { await deleteDoc(doc(db, "requests", id)); loadMyPatients(); }
 };
 
-// Asignar Ejercicio
+// 5. ASIGNAR EJERCICIO (CON SEGURIDAD)
 document.getElementById('assignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const ex = document.getElementById('exerciseSelect').value;
+    
+    // --- VALIDACIÓN DE SEGURIDAD ---
+    if (!selectedPatientId) return alert("⚠️ Selecciona un paciente primero.");
     const reps = document.getElementById('repsMeta').value;
+    if (reps < 1) return alert("⚠️ La meta debe ser mayor a 0.");
+    if (reps > 100 && !confirm("⚠️ ¿Seguro que quieres mandar más de 100 repeticiones?")) return;
+    // -------------------------------
+
+    const ex = document.getElementById('exerciseSelect').value;
     const btn = document.getElementById('btnAssign');
     
     btn.disabled = true; btn.innerText = "Enviando...";
@@ -208,43 +212,63 @@ document.getElementById('assignForm').addEventListener('submit', async (e) => {
     btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Enviar Rutina';
 });
 
-// Historial y PDF
+// 6. HISTORIAL Y WHATSAPP INTELIGENTE
 document.getElementById('btnRefreshHistory').addEventListener('click', async () => {
     const table = document.getElementById('historyTableBody');
     table.innerHTML = "<tr><td colspan='5'>Cargando...</td></tr>";
     
-    const q = query(collection(db, "assignments"), where("id_doctor", "==", auth.currentUser.uid), where("estado", "==", "completado"));
-    const snap = await getDocs(q);
-    table.innerHTML = "";
+    try {
+        const q = query(collection(db, "assignments"), where("id_doctor", "==", auth.currentUser.uid), where("estado", "==", "completado"), orderBy("fecha_completado", "desc"), limit(20));
+        const snap = await getDocs(q);
+        table.innerHTML = "";
 
-    if(snap.empty) { table.innerHTML = "<tr><td colspan='5'>Sin datos.</td></tr>"; return; }
+        if(snap.empty) { table.innerHTML = "<tr><td colspan='5'>Sin datos recientes.</td></tr>"; return; }
 
-    for (const d of snap.docs) {
-        const data = d.data();
-        let name = "Paciente";
-        try {
-            const u = await getDoc(doc(db, "users", data.id_paciente));
-            if(u.exists()) name = u.data().nombre;
-        } catch(e) {}
-        
-        const row = `<tr>
-            <td>${name}</td>
-            <td>${data.tipo_ejercicio}</td>
-            <td><strong style="color:#10b981">${data.reps_realizadas}</strong> / ${data.reps_meta}</td>
-            <td>${new Date(data.fecha_completado.seconds*1000).toLocaleDateString()}</td>
-            <td><button class="btn" style="padding:5px 10px; font-size:0.8rem;" onclick="generarPDF('${name}','${data.tipo_ejercicio}',${data.reps_realizadas})"><i class="fa-solid fa-file-pdf"></i></button></td>
-        </tr>`;
-        table.innerHTML += row;
+        for (const d of snap.docs) {
+            const data = d.data();
+            let name = "Paciente";
+            let telefono = "";
+
+            try {
+                const u = await getDoc(doc(db, "users", data.id_paciente));
+                if(u.exists()) {
+                    name = u.data().nombre || "Sin Nombre";
+                    telefono = u.data().telefono || "";
+                }
+            } catch(e) {}
+            
+            const row = `<tr>
+                <td>${name}</td>
+                <td>${data.tipo_ejercicio}</td>
+                <td><strong style="color:#10b981">${data.reps_realizadas}</strong> / ${data.reps_meta}</td>
+                <td>${new Date(data.fecha_completado.seconds*1000).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn" style="padding:5px 10px; font-size:0.8rem; margin-right:5px;" onclick="generarPDF('${name}','${data.tipo_ejercicio}',${data.reps_realizadas})"><i class="fa-solid fa-file-pdf"></i></button>
+                    <button class="btn" style="padding:5px 10px; font-size:0.8rem; background:#25D366; color:white;" onclick="enviarWhatsApp('${telefono}', '${name}', '${data.tipo_ejercicio}', ${data.reps_realizadas})"><i class="fa-brands fa-whatsapp"></i></button>
+                </td>
+            </tr>`;
+            table.innerHTML += row;
+        }
+    } catch (e) {
+        console.error(e);
+        table.innerHTML = `<tr><td colspan='5'>Error: ${e.message}</td></tr>`;
     }
 });
 
-// PDF Global
+// Funciones Globales
 window.generarPDF = (nombre, ej, reps) => {
     if(!window.jspdf) return alert("Cargando librería PDF...");
     const doc = new window.jspdf.jsPDF();
     doc.text(`Reporte: ${nombre}`, 10, 10);
     doc.text(`Ejercicio: ${ej} - Reps: ${reps}`, 10, 20);
     doc.save(`Reporte_${nombre}.pdf`);
+};
+
+window.enviarWhatsApp = (telefono, nombre, ejercicio, reps) => {
+    if (!telefono || telefono.length < 5) return alert("⚠️ Este paciente no tiene teléfono registrado.");
+    const numeroLimpio = telefono.replace(/\D/g,''); 
+    const mensaje = `Hola ${nombre}, soy tu doctor. Vi que completaste ${reps} repeticiones de ${ejercicio}. ¡Sigue así! 💪`;
+    window.open(`https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
 };
 
 // Auth
