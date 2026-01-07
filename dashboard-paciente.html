@@ -3,67 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Rehabilitación</title>
+    <title>Mi Rehabilitación - TeleRehab</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { padding: 20px; background-color: #f4f6f9; font-family: sans-serif; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        .container { max-width: 800px; margin: 0 auto; }
-        
-        /* Tarjeta de Ejercicio */
-        .task-card { 
-            background: white; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border-radius: 10px; 
-            border-left: 5px solid #ffc107; /* Amarillo = Pendiente */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .btn-start { 
-            background-color: #007bff; 
-            color: white; 
-            padding: 10px 20px; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold;
-        }
-        .btn-start:hover { background-color: #0056b3; }
-        
-        .logout { color: red; cursor: pointer; border: 1px solid red; padding: 5px 10px; border-radius: 5px; background: white; }
-    </style>
 </head>
 <body>
+
     <div class="header">
-        <h1>👋 Hola, <span id="userName">Paciente</span></h1>
-        <button id="logoutBtn" class="logout">Salir</button>
+        <div>
+            <h1 style="font-size: 1.2rem; color: var(--text-muted);">Bienvenido de vuelta,</h1>
+            <h2 id="userName" style="margin: 0; color: var(--primary); font-size: 1.5rem;">Cargando...</h2>
+        </div>
+        <button id="logoutBtn" class="btn-logout">
+            <i class="fa-solid fa-power-off"></i> Salir
+        </button>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-        <a href="biblioteca.html" style="background-color: #6f42c1; color: white; padding: 10px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            📖 Ver Guía de Ejercicios
+    <div class="container" style="text-align: center; margin-bottom: 0;">
+        <a href="biblioteca.html" class="btn" style="background: var(--bg-card); border: 1px solid var(--primary); color: var(--primary); border-radius: 50px; padding: 10px 30px;">
+            <i class="fa-solid fa-book-open"></i> Ver Guía de Ejercicios
         </a>
     </div>
 
     <div class="container">
         
         <div id="directorySection" style="display: none;">
-            <h3>👨‍⚕️ Encuentra a tu Especialista</h3>
-            <p>Selecciona un fisioterapeuta para comenzar tu tratamiento.</p>
-            <div id="doctorsList" class="doctors-grid">
-                <p>Cargando especialistas...</p>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <i class="fa-solid fa-user-doctor" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 10px;"></i>
+                <h3>Encuentra a tu Especialista</h3>
+                <p style="color: var(--text-muted);">Selecciona un fisioterapeuta para comenzar tu tratamiento.</p>
             </div>
+            
+            <div id="doctorsList" class="grid-container">
+                </div>
         </div>
 
         <div id="exercisesSection">
-            <h3>📅 Tus Ejercicios Pendientes</h3>
+            <h3 style="border-left: 4px solid var(--success); padding-left: 15px; margin-bottom: 25px;">
+                📅 Tus Ejercicios Pendientes
+            </h3>
+            
             <div id="exercisesList">
-                <p>Cargando tus tareas...</p>
+                <p style="color: var(--text-muted);">Cargando tus tareas...</p>
             </div>
         </div>
 

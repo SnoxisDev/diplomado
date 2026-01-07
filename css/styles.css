@@ -168,3 +168,34 @@ tr:hover td { background-color: var(--bg-hover); color: white; }
     text-align: center;
     border: 1px solid var(--border);
 }
+
+/* Asegúrate de tener esto en tu styles.css para que se vea oscuro */
+
+.task-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+}
+
+.doctor-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.doctor-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+/* Color de los textos en las tarjetas */
+.task-card h3, .doctor-card h3 { color: var(--text-main); }
+.task-card p, .doctor-card p { color: var(--text-muted); }
