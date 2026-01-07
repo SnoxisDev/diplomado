@@ -6,6 +6,10 @@
     <title>Panel Médico - TeleRehab AI</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -17,17 +21,12 @@
         
         <div style="display: flex; align-items: center; gap: 20px;">
             <div class="notification-wrapper" style="position: relative; cursor: pointer;">
-                <span id="bellBtn" style="font-size: 1.5rem; color: var(--text-muted); transition: color 0.3s;">
+                <span id="bellBtn" style="font-size: 1.5rem; color: var(--text-muted);">
                     <i class="fa-regular fa-bell"></i>
                 </span>
                 <span id="notificationBadge" style="display:none; position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 6px;">0</span>
-                
                 <div id="dropdownMenu" style="display: none; position: absolute; right: 0; top: 35px; background: var(--bg-card); border: 1px solid var(--border); width: 300px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 1000; border-radius: 8px;">
-                    <div style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--text-main);">
-                        Solicitudes Recientes
-                    </div>
-                    <div id="requestsList" style="max-height: 300px; overflow-y: auto;">
-                        </div>
+                    <div id="requestsList" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
             </div>
 
@@ -38,10 +37,9 @@
     </div>
 
     <div class="container">
-        
         <div class="grid-container">
             
-            <div class="card" style="min-height: 400px;">
+            <div class="card" style="min-height: 500px;">
                 <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
                     <i class="fa-solid fa-users"></i> Mis Pacientes
                 </h3>
@@ -52,25 +50,36 @@
 
             <div class="card">
                 <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-clipboard-list"></i> Asignar Nueva Rutina
+                    <i class="fa-solid fa-chart-line"></i> Progreso del Paciente
                 </h3>
                 
                 <div id="selectedPatientName" style="background: rgba(59, 130, 246, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 20px; color: var(--primary);">
-                    <i class="fa-solid fa-circle-info"></i> Selecciona un paciente de la izquierda
+                    <i class="fa-solid fa-circle-info"></i> Selecciona un paciente para ver su evolución
                 </div>
 
+                <div style="height: 250px; width: 100%; margin-bottom: 20px;">
+                    <canvas id="patientChart"></canvas>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+
+                <h4 style="margin-top: 0; color: var(--text-main);">Asignar Nueva Tarea</h4>
                 <form id="assignForm">
-                    <label style="font-size: 0.9rem; color: var(--text-muted);">Tipo de Ejercicio</label>
-                    <select id="exerciseSelect" style="margin-bottom: 20px;">
-                        <option value="flexion_codo">💪 Flexión de Codo (Bíceps)</option>
-                        <option value="sentadilla">🦵 Sentadilla (Squat)</option>
-                    </select>
-
-                    <label style="font-size: 0.9rem; color: var(--text-muted);">Meta de Repeticiones</label>
-                    <input type="number" id="repsMeta" placeholder="Ej: 10" min="1" value="5" style="margin-bottom: 20px;">
-
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: var(--text-muted);">Ejercicio</label>
+                            <select id="exerciseSelect">
+                                <option value="flexion_codo">💪 Flexión Codo</option>
+                                <option value="sentadilla">🦵 Sentadilla</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: var(--text-muted);">Meta Reps</label>
+                            <input type="number" id="repsMeta" placeholder="10" min="1" value="5">
+                        </div>
+                    </div>
                     <button type="submit" id="btnAssign" class="btn-assign" style="width: 100%;" disabled>
-                        <i class="fa-regular fa-paper-plane"></i> Enviar Ejercicio
+                        <i class="fa-regular fa-paper-plane"></i> Enviar Rutina
                     </button>
                 </form>
             </div>
@@ -79,30 +88,20 @@
 
         <div class="card" style="margin-top: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Historial de Actividad</h3>
+                <h3 style="margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Historial Global</h3>
                 <button id="btnRefreshHistory" class="btn" style="background: var(--bg-hover); color: white;">
                     <i class="fa-solid fa-arrows-rotate"></i> Actualizar
                 </button>
             </div>
-            
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Paciente</th>
-                            <th>Ejercicio</th>
-                            <th>Rendimiento</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
+                        <tr><th>Paciente</th><th>Ejercicio</th><th>Rendimiento</th><th>Fecha</th><th>Acciones</th></tr>
                     </thead>
-                    <tbody id="historyTableBody">
-                        <tr><td colspan="5" style="text-align: center;">Haz clic en actualizar para ver datos.</td></tr>
-                    </tbody>
+                    <tbody id="historyTableBody"></tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
     <script type="module" src="./js/doctor.js"></script>
