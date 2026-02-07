@@ -10,27 +10,45 @@
 <body>
 
     <div class="header">
-    <div style="display: flex; align-items: center; gap: 15px;">
+    
+    <a href="perfil.html" class="profile-circle" title="Mi Perfil">
+        <img src="https://ui-avatars.com/api/?name=Pa&background=random" alt="Perfil" id="headerAvatar">
+    </a>
+
+    <div class="logo-center">
         <img src="img/logo-sira.png.png" alt="SIRA" class="logo-nav">
-        <div>
-            <h1 style="font-size: 1.2rem; color: var(--text-muted); margin: 0;">Bienvenido de vuelta,</h1>
-            <h2 id="userName" style="margin: 0; color: var(--primary); font-size: 1.5rem;">Cargando...</h2>
-        </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <a href="perfil.html" class="btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); text-decoration: none;">
-            <i class="fa-solid fa-user-gear"></i> Mi Perfil
-        </a>
-        <button id="logoutBtn" class="btn-logout">
-            <i class="fa-solid fa-power-off"></i> Salir
+    <div class="toolbar-right">
+        
+        <div class="notification-wrapper">
+            <button id="bellBtn" class="icon-btn">
+                <i class="fa-regular fa-bell"></i>
+                <span id="notificationBadge" class="badge-dot" style="display:none;"></span>
+            </button>
+            
+            <div id="dropdownMenu" class="dropdown-content">
+                <div id="requestsList">
+                    <div style="padding:15px; text-align:center; color:gray; font-size:0.9rem;">
+                        No tienes notificaciones nuevas
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="logoutBtn" class="icon-btn logout-color" title="Cerrar Sesión">
+            <i class="fa-solid fa-power-off"></i>
         </button>
     </div>
+
 </div>
 
     <div class="container">
-        
-        <div id="directorySection" style="display: none;">
+    
+    <h2 style="margin-top: 20px; margin-bottom: 20px;">
+        Hola, <span id="userName">Paciente</span> 👋
+    </h2>
+    <div id="directorySection" style="display: none;">
             <div style="text-align: center; margin-bottom: 30px;">
                 <i class="fa-solid fa-user-doctor" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 10px;"></i>
                 <h3>Encuentra a tu Especialista</h3>
