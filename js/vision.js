@@ -180,8 +180,9 @@ pose.setOptions({
 pose.onResults(onResults);
 
 const camera = new Camera(videoElement, {
-    onFrame: async () => { if(!isFinished) await pose.send({image: videoElement}) },
-    width: 1280, // Forzar HD para evitar pixelado
-    height: 720
+    onFrame: async () => { await pose.send({image: videoElement}); },
+    // Eliminamos width y height fijos para que el iPhone use su resolución nativa
+    width: window.innerWidth > 600 ? 1280 : 640, 
+    height: window.innerWidth > 600 ? 720 : 480
 });
 camera.start();
