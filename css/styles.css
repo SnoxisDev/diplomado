@@ -243,3 +243,95 @@ tr:hover td { background-color: var(--bg-hover); color: white; }
     align-items: center; /* Centramos todo verticalmente */
 }
 
+/* =========================================
+   CORRECCIONES PARA MÓVIL (RESPONSIVE)
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    /* 1. ARREGLAR LOGIN */
+    .login-box {
+        width: 90%;          /* Que no sea fijo, sino el 90% de la pantalla */
+        padding: 25px 15px;  /* Menos relleno interno */
+        margin-top: 20px;
+    }
+
+    .logo-login {
+        /* Bajamos el zoom agresivo del logo en móvil */
+        transform: scale(1.2); 
+        width: 100px; /* Tamaño base más pequeño */
+        margin-bottom: 20px;
+    }
+
+    /* 2. ARREGLAR HEADER (Barras de arriba) */
+    .header {
+        flex-direction: column; /* Pone los elementos uno debajo del otro */
+        height: auto;           /* Altura automática */
+        padding: 15px;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .header > div {
+        justify-content: center; /* Centra el logo y el título */
+        width: 100%;
+    }
+
+    .logo-nav {
+        /* Quitamos el zoom gigante en el header móvil */
+        transform: scale(1.0); 
+        height: 50px;
+        margin-right: 10px;
+        margin-left: 0;
+    }
+
+    .header h1 {
+        font-size: 1.2rem; /* Texto más pequeño */
+    }
+
+    /* 3. ARREGLAR TABLAS (Que se puedan deslizar con el dedo) */
+    .card {
+        padding: 15px; /* Menos borde en las tarjetas */
+    }
+    
+    table {
+        font-size: 0.8rem; /* Letra de tabla más pequeña */
+    }
+    
+    th, td {
+        padding: 8px 5px; /* Celdas más compactas */
+    }
+
+    /* Botones de acción en tabla más pequeños */
+    .btn-action {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+
+    /* 4. ARREGLAR MONITOR (CÁMARA) */
+    .input_video, .output_canvas {
+        width: 100% !important; /* Que ocupe todo el ancho del cel */
+        height: auto !important; /* Que la altura se ajuste sola */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Centrado perfecto */
+    }
+
+    .monitor-header {
+        background: rgba(0,0,0,0.5); /* Fondo semitransparente para leer mejor */
+        width: 100%;
+        padding: 10px;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    /* HUD (Texto de repeticiones) más pequeño para no estorbar */
+    .hud-panel {
+        transform: scale(0.8); 
+        top: 60px; /* Bajarlo un poco para que no choque con el header */
+        left: 10px;
+    }
+}
+
