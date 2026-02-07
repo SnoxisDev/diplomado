@@ -199,3 +199,28 @@ tr:hover td { background-color: var(--bg-hover); color: white; }
 /* Color de los textos en las tarjetas */
 .task-card h3, .doctor-card h3 { color: var(--text-main); }
 .task-card p, .doctor-card p { color: var(--text-muted); }
+
+/* --- ESTILOS DEL NUEVO LOGO SIRA (VERSIÓN GRANDE) --- */
+
+.logo-login {
+    width: 180px;  /* AUMENTADO de 100px a 180px */
+    height: auto;
+    display: block;
+    margin: 0 auto 20px auto; /* Un poco más de espacio abajo */
+    /* Efecto de brillo más intenso para que resalte */
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6)); 
+    transition: transform 0.3s ease;
+}
+
+.logo-login:hover {
+    transform: scale(1.05); /* Pequeño efecto de zoom al pasar el mouse */
+}
+
+.logo-nav {
+    height: 65px;  /* AUMENTADO de 45px a 65px para la barra superior */
+    width: auto;
+    object-fit: contain;
+    margin-right: 15px;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
+    vertical-align: middle;
+}
