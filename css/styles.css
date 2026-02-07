@@ -200,27 +200,46 @@ tr:hover td { background-color: var(--bg-hover); color: white; }
 .task-card h3, .doctor-card h3 { color: var(--text-main); }
 .task-card p, .doctor-card p { color: var(--text-muted); }
 
-/* --- ESTILOS DEL NUEVO LOGO SIRA (VERSIÓN GRANDE) --- */
+/* --- LOGO SIRA: EFECTO ZOOM (Grande sin deformar la barra) --- */
 
+/* 1. Logo del Login */
 .logo-login {
-    width: 180px;  /* AUMENTADO de 100px a 180px */
-    height: auto;
+    width: 120px;   /* Tamaño "físico" pequeño para no ensanchar la caja */
     display: block;
-    margin: 0 auto 20px auto; /* Un poco más de espacio abajo */
-    /* Efecto de brillo más intenso para que resalte */
-    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6)); 
-    transition: transform 0.3s ease;
+    margin: 10px auto 30px auto; 
+    
+    /* EL TRUCO: Lo escalamos visualmente un 70% más */
+    transform: scale(1.7); 
+    transform-origin: center center;
+    
+    /* Efectos */
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6));
+    position: relative;
+    z-index: 10;
 }
 
-.logo-login:hover {
-    transform: scale(1.05); /* Pequeño efecto de zoom al pasar el mouse */
-}
-
+/* 2. Logo de la Barra Superior (Header) */
 .logo-nav {
-    height: 65px;  /* AUMENTADO de 45px a 65px para la barra superior */
+    height: 40px;   /* Mantenemos la altura "física" pequeña (Barra fina) */
     width: auto;
-    object-fit: contain;
-    margin-right: 15px;
+    
+    /* EL TRUCO: Zoom visual del doble (2.0) */
+    transform: scale(2.0); 
+    transform-origin: left center; /* Crece desde la izquierda */
+    
+    /* Importante: Margen a la derecha para que el texto no quede debajo del logo */
+    margin-left: 10px;
+    margin-right: 45px; 
+    
     filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
-    vertical-align: middle;
 }
+
+/* 3. Ajuste para que la barra no crezca aunque el logo se salga un poco */
+.header {
+    height: 70px;       /* Forzamos una altura estándar elegante */
+    min-height: unset;  /* Quitamos restricciones anteriores */
+    overflow: visible;  /* Permitimos que el logo "sobresalga" si es muy grande */
+    display: flex;
+    align-items: center; /* Centramos todo verticalmente */
+}
+
