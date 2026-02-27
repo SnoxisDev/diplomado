@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRA - Panel de Administración</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 40px; height: 40px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">AD</div>
+            <h2>Panel de Administrador</h2>
+        </div>
+        <button id="logoutBtn" class="btn-logout" title="Cerrar Sesión">
+            <i class="fa-solid fa-power-off"></i> Salir
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="grid-container">
+            
+            <div class="card" style="grid-column: span 1;">
+                <h3 style="color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <i class="fa-solid fa-users-gear"></i> Usuarios Registrados
+                </h3>
+                <div style="overflow-x: auto; margin-top: 15px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Rol</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersTable">
+                            <tr><td colspan="3">Cargando usuarios...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: span 1;">
+                <h3 style="color: var(--warning); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <i class="fa-solid fa-clipboard-list"></i> Bitácora del Sistema
+                </h3>
+                <div style="overflow-x: auto; margin-top: 15px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Acción</th>
+                                <th>Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bitacoraTable">
+                            <tr><td colspan="3">Cargando bitácora...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>t

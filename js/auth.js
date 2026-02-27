@@ -70,12 +70,22 @@ authForm.addEventListener('submit', async (e) => {
             alert(`✅ ¡Bienvenido, ${nombre}!`);
             redirigir(rol);
 
-        } else {
+       } else {
             // --- LOGIN ---
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Buscar rol
+            // ==========================================
+            // NUEVO: VERIFICACIÓN DE ADMINISTRADOR
+            // ==========================================
+            if (user.email === "admin@gmail.com") {
+                alert("¡Bienvenido al Panel de Administración!");
+                window.location.href = "dashboard-admin.html";
+                return; // Detiene el código aquí para que no busque rol de doctor/paciente
+            }
+            // ==========================================
+
+            // Buscar rol si NO es el administrador
             const docSnap = await getDoc(doc(db, "users", user.uid));
             
             if (docSnap.exists()) {
