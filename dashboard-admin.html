@@ -6,6 +6,85 @@
     <title>SIRA - Panel de Administración</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--primary);
+        }
+        .stat-card h2 {
+            font-size: 2.5rem;
+            margin: 10px 0 0 0;
+            color: var(--text-main);
+        }
+        .stat-card p {
+            color: var(--text-muted);
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+            background: var(--bg-main);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .filter-group input {
+            margin-bottom: 0;
+            padding: 10px;
+        }
+        .btn-filter {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 42px;
+        }
+        .btn-clear {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 42px;
+        }
+        .btn-clear:hover {
+            background: var(--danger);
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,15 +93,36 @@
             <div style="width: 40px; height: 40px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">AD</div>
             <h2>Panel de Administrador</h2>
         </div>
+        
         <button id="logoutBtn" class="btn-logout" title="Cerrar Sesión">
             <i class="fa-solid fa-power-off"></i> Salir
         </button>
     </div>
+    
 
     <div class="container">
-        <div class="grid-container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p><i class="fa-solid fa-users"></i> Total Usuarios</p>
+                <h2 id="stat-total-usuarios">0</h2>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--secondary);">
+                <p><i class="fa-solid fa-user-injured"></i> Pacientes</p>
+                <h2 id="stat-pacientes">0</h2>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--warning);">
+                <p><i class="fa-solid fa-user-doctor"></i> Doctores</p>
+                <h2 id="stat-doctores">0</h2>
+            </div>
+            <div class="stat-card" style="border-top-color: #28a745;">
+                <p><i class="fa-solid fa-check-double"></i> Rutinas Completadas</p>
+                <h2 id="stat-rutinas">0</h2>
+            </div>
+        </div>
+
+        <div class="grid-container" style="grid-template-columns: 1fr;">
             
-            <div class="card" style="grid-column: span 1;">
+            <div class="card">
                 <h3 style="color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
                     <i class="fa-solid fa-users-gear"></i> Usuarios Registrados
                 </h3>
@@ -42,10 +142,24 @@
                 </div>
             </div>
 
-            <div class="card" style="grid-column: span 1;">
+            <div class="card" style="margin-top: 20px;">
                 <h3 style="color: var(--warning); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
                     <i class="fa-solid fa-clipboard-list"></i> Bitácora del Sistema
                 </h3>
+                
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label>Desde:</label>
+                        <input type="date" id="filtro-fecha-inicio">
+                    </div>
+                    <div class="filter-group">
+                        <label>Hasta:</label>
+                        <input type="date" id="filtro-fecha-fin">
+                    </div>
+                    <button id="btn-filtrar-bitacora" class="btn-filter"><i class="fa-solid fa-search"></i> Filtrar</button>
+                    <button id="btn-limpiar-filtro" class="btn-clear"><i class="fa-solid fa-eraser"></i> Limpiar</button>
+                </div>
+
                 <div style="overflow-x: auto; margin-top: 15px;">
                     <table>
                         <thead>
@@ -67,4 +181,4 @@
 
     <script type="module" src="js/admin.js"></script>
 </body>
-</html>t
+</html>
