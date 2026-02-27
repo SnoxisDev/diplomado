@@ -50,6 +50,16 @@ async function finishExercise() {
                 fecha_completado: new Date(),
                 reps_realizadas: count
             });
+
+            // Guardar en la bitácora que el paciente terminó
+            const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            await addDoc(collection(db, "bitacora"), {
+                fecha: new Date(),
+                usuario_id: "Paciente", // Como vision.js no importa auth fácilmente, lo dejamos genérico
+                accion: "EJERCICIO COMPLETADO",
+                detalle: `Un paciente completó ${count} repeticiones de ${EXERCISE_TYPE}`
+            });
+            
             setTimeout(() => {
                 alert("✅ Ejercicio guardado. Volviendo al menú.");
                 window.location.href = "dashboard-paciente.html";

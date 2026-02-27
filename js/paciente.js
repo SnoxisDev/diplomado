@@ -172,6 +172,15 @@ window.enviarSolicitud = async (doctorId, doctorName) => {
             id_paciente: patientId, nombre_paciente: patientName,
             estado: "pendiente", fecha: new Date()
         });
+
+        // Guardar en bitácora
+        await addDoc(collection(db, "bitacora"), {
+            fecha: new Date(),
+            usuario_id: patientId,
+            accion: "NUEVA SOLICITUD",
+            detalle: `El paciente ${patientName} solicitó atención al ${doctorName}`
+        });
+        
         alert("Solicitud enviada exitosamente.");
         window.location.reload(); // Recargar para que checkStatus actualice la vista
     } catch (e) {

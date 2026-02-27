@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const usersTable = document.getElementById('adminUsersTable');
 const bitacoraTable = document.getElementById('bitacoraTable');
@@ -80,6 +80,14 @@ window.eliminarUsuario = async (userId, nombre) => {
             await deleteDoc(doc(db, "users", userId));
             alert("Usuario eliminado correctamente.");
             cargarUsuarios(); // Recargar la tabla
+
+            // Guardar en bitácora
+            await addDoc(collection(db, "bitacora"), {
+                fecha: new Date(),
+                usuario_id: auth.currentUser.uid,
+                accion: "USUARIO ELIMINADO",
+                detalle: `El Administrador eliminó del sistema al usuario: ${nombre}`
+            });
         } catch (error) {
             alert("Error al eliminar: " + error.message);
         }

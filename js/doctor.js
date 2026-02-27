@@ -2,6 +2,25 @@ import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// ==========================================
+// NUEVO: SISTEMA DE BITÁCORA DE ACCIONES
+// ==========================================
+async function registrarBitacora(accion, detalle) {
+    try {
+        // Necesitamos importar addDoc y collection, que ya los tienes arriba
+        await addDoc(collection(db, "bitacora"), {
+            fecha: new Date(),
+            usuario_id: auth.currentUser.uid,
+            accion: accion,
+            detalle: detalle
+        });
+        console.log("✅ Bitácora registrada:", accion);
+    } catch (e) {
+        console.error("❌ Error al guardar bitácora:", e);
+    }
+}
+// ==========================================
+
 // VARIABLES GLOBALES
 let selectedPatientId = null;
 let chartInstance = null;
@@ -181,7 +200,11 @@ async function loadMyPatients() {
 }
 
 window.desvincular = async (id) => {
-    if(confirm("¿Eliminar paciente?")) { await deleteDoc(doc(db, "requests", id)); loadMyPatients(); }
+    if(confirm("¿Eliminar paciente?")) { 
+        await deleteDoc(doc(db, "requests", id)); 
+        await registrarBitacora("ELIMINAR PACIENTE", `El doctor eliminó la conexión con la solicitud ID: ${id}`);
+        loadMyPatients(); 
+    }
 };
 
 // 5. ASIGNAR EJERCICIO (CON SEGURIDAD)
@@ -208,6 +231,11 @@ document.getElementById('assignForm').addEventListener('submit', async (e) => {
         fecha: new Date(),
         reps_realizadas: 0
     });
+
+    // --- ESTA ES LA LÍNEA NUEVA QUE FALTABA ---
+    await registrarBitacora("ASIGNAR RUTINA", `Se asignó el ejercicio ${ex} (${reps} reps) al paciente ID: ${selectedPatientId}`);
+    // ------------------------------------------
+    
     alert("✅ Rutina enviada");
     btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Enviar Rutina';
 });
