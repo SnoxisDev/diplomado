@@ -176,6 +176,35 @@
                 </div>
             </div>
 
+           <div class="card" style="margin-top: 20px; grid-column: 1 / -1;">
+                <h3 style="color: #10b981; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <i class="fa-solid fa-globe"></i> Control Global de Rutinas
+                </h3>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
+                    <button onclick="filtrarEstadoGlobal('todas')" class="btn" style="background: #334155; color: white; font-size: 0.8rem;">Todas</button>
+                    <button onclick="filtrarEstadoGlobal('pendiente')" class="btn" style="background: var(--warning); color: black; font-size: 0.8rem;">Solo Pendientes</button>
+                    <button onclick="filtrarEstadoGlobal('completado')" class="btn" style="background: var(--success); color: white; font-size: 0.8rem;">Solo Completadas</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Doctor</th>
+                                <th>Ejercicio</th>
+                                <th>Estado</th>
+                                <th>Progreso</th>
+                            </tr>
+                        </thead>
+                        <tbody id="globalAssignmentsTable">
+                            <tr><td colspan="5">Cargando rutinas y nombres del hospital...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 

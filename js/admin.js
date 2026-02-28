@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const usersTable = document.getElementById('adminUsersTable');
 const bitacoraTable = document.getElementById('bitacoraTable');
@@ -10,6 +10,7 @@ async function cargarUsuarios() {
     try {
         const q = query(collection(db, "users"));
         const snapshot = await getDocs(q);
+        const usersTable = document.getElementById('adminUsersTable');
         usersTable.innerHTML = "";
 
         if (snapshot.empty) {
@@ -28,7 +29,10 @@ async function cargarUsuarios() {
                     <td><strong>${user.nombre}</strong><br><small style="color:gray;">${docSnap.id}</small></td>
                     <td>${rolBadge}</td>
                     <td>
-                        <button onclick="eliminarUsuario('${docSnap.id}', '${user.nombre}')" class="btn" style="background: #ef4444; color: white; padding: 5px 10px; font-size: 0.8rem;">
+                        <button onclick="cambiarRol('${docSnap.id}', '${user.nombre}', '${user.rol}')" class="btn" style="background: var(--warning); color: #000; padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" title="Cambiar Rol">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </button>
+                        <button onclick="eliminarUsuario('${docSnap.id}', '${user.nombre}')" class="btn" style="background: #ef4444; color: white; padding: 5px 10px; font-size: 0.8rem;" title="Eliminar">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -40,38 +44,33 @@ async function cargarUsuarios() {
     }
 }
 
-// 2. CARGAR LA BITÁCORA (READ)
-async function cargarBitacora() {
-    try {
-        // Traemos la bitácora ordenada por fecha (los más recientes primero)
-        const q = query(collection(db, "bitacora"), orderBy("fecha", "desc"));
-        const snapshot = await getDocs(q);
-        bitacoraTable.innerHTML = "";
-
-        if (snapshot.empty) {
-            bitacoraTable.innerHTML = "<tr><td colspan='3'>La bitácora está vacía.</td></tr>";
-            return;
-        }
-
-        snapshot.forEach(docSnap => {
-            const registro = docSnap.data();
+// 1.5 EDITAR ROL DE USUARIO (UPDATE)
+window.cambiarRol = async (userId, nombre, rolActual) => {
+    const nuevoRol = prompt(`Cambiar rol de: ${nombre}\nRol actual: ${rolActual}\n\nEscribe 'doctor' o 'paciente' para cambiarlo:`, rolActual);
+    
+    if (nuevoRol && (nuevoRol.toLowerCase() === 'doctor' || nuevoRol.toLowerCase() === 'paciente') && nuevoRol.toLowerCase() !== rolActual) {
+        try {
+            await updateDoc(doc(db, "users", userId), { rol: nuevoRol.toLowerCase() });
             
-            // Formatear la fecha para que se lea bien
-            const fechaObj = registro.fecha.toDate();
-            const fechaStr = fechaObj.toLocaleDateString() + " " + fechaObj.toLocaleTimeString();
+            // Registrar en bitácora
+            await addDoc(collection(db, "bitacora"), {
+                fecha: new Date(),
+                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
+                accion: "CAMBIO DE ROL",
+                detalle: `El Administrador cambió el rol de ${nombre} a ${nuevoRol.toLowerCase()}`
+            });
 
-            bitacoraTable.innerHTML += `
-                <tr>
-                    <td style="font-size: 0.8rem; color: #94a3b8;">${fechaStr}</td>
-                    <td><strong style="color: #f59e0b;">${registro.accion}</strong></td>
-                    <td style="font-size: 0.9rem;">${registro.detalle}</td>
-                </tr>
-            `;
-        });
-    } catch (error) {
-        console.error("Error al cargar bitácora:", error);
+            alert(`✅ Rol actualizado con éxito.`);
+            cargarUsuarios(); 
+            if(typeof cargarEstadisticas === 'function') cargarEstadisticas(); 
+            if(typeof cargarBitacoraConFiltro === 'function') cargarBitacoraConFiltro();
+        } catch (error) {
+            alert("❌ Error al cambiar rol: " + error.message);
+        }
+    } else if (nuevoRol && nuevoRol.toLowerCase() !== rolActual) {
+        alert("⚠️ Rol no válido. Escribe exactamente 'doctor' o 'paciente'.");
     }
-}
+};
 
 // 3. ELIMINAR USUARIO (DELETE)
 window.eliminarUsuario = async (userId, nombre) => {
@@ -79,20 +78,98 @@ window.eliminarUsuario = async (userId, nombre) => {
         try {
             await deleteDoc(doc(db, "users", userId));
             alert("Usuario eliminado correctamente.");
-            cargarUsuarios(); // Recargar la tabla
+            cargarUsuarios(); 
+            if(typeof cargarEstadisticas === 'function') cargarEstadisticas();
 
-            // Guardar en bitácora
             await addDoc(collection(db, "bitacora"), {
                 fecha: new Date(),
-                usuario_id: auth.currentUser.uid,
+                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
                 accion: "USUARIO ELIMINADO",
                 detalle: `El Administrador eliminó del sistema al usuario: ${nombre}`
             });
+            if(typeof cargarBitacoraConFiltro === 'function') cargarBitacoraConFiltro();
         } catch (error) {
             alert("Error al eliminar: " + error.message);
         }
     }
 };
+
+// 4. CARGAR RUTINAS GLOBALES
+// ==========================================
+// 3.5 CONTROL GLOBAL DE RUTINAS (CON NOMBRES Y FILTROS)
+// ==========================================
+let rutinasGlobalesMemoria = []; // Guardamos los datos aquí para que los filtros sean súper rápidos
+
+async function cargarRutinasGlobales() {
+    const globalTable = document.getElementById('globalAssignmentsTable');
+    if(!globalTable) return;
+
+    try {
+        // 1. Traer todas las rutinas asignadas
+        const q = query(collection(db, "assignments"), orderBy("fecha", "desc"));
+        const snapshot = await getDocs(q);
+        
+        // 2. Traer todos los usuarios para cruzar sus IDs por Nombres (Súper optimizado)
+        const usersSnap = await getDocs(collection(db, "users"));
+        const nombresMap = {};
+        usersSnap.forEach(u => nombresMap[u.id] = u.data().nombre);
+
+        rutinasGlobalesMemoria = [];
+        
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            rutinasGlobalesMemoria.push({
+                ...data,
+                // Si el ID existe, ponemos el nombre, si no, ponemos "Usuario Eliminado"
+                nombrePaciente: nombresMap[data.id_paciente] || "Usuario Eliminado",
+                nombreDoctor: nombresMap[data.id_doctor] || "Doctor Desconocido"
+            });
+        });
+
+        // Mostramos "todas" al cargar por primera vez
+        renderizarTablaGlobal(rutinasGlobalesMemoria);
+
+    } catch (error) {
+        console.error("Error al cargar rutinas globales:", error);
+    }
+}
+
+// Función que se activa al hacer clic en las pestañas (botones)
+window.filtrarEstadoGlobal = (estado) => {
+    if (estado === 'todas') {
+        renderizarTablaGlobal(rutinasGlobalesMemoria);
+    } else {
+        const filtrados = rutinasGlobalesMemoria.filter(r => r.estado === estado);
+        renderizarTablaGlobal(filtrados);
+    }
+};
+
+// Función que dibuja el HTML de la tabla
+function renderizarTablaGlobal(datos) {
+    const globalTable = document.getElementById('globalAssignmentsTable');
+    globalTable.innerHTML = "";
+
+    if (datos.length === 0) {
+        globalTable.innerHTML = "<tr><td colspan='5'>No hay rutinas en esta categoría.</td></tr>";
+        return;
+    }
+
+    datos.forEach(data => {
+        let estadoBadge = data.estado === 'completado' 
+            ? '<span style="color: #10b981; font-weight: bold;"><i class="fa-solid fa-check"></i> Completado</span>'
+            : '<span style="color: #f59e0b; font-weight: bold;"><i class="fa-solid fa-hourglass-half"></i> Pendiente</span>';
+
+        globalTable.innerHTML += `
+            <tr>
+                <td><strong>${data.nombrePaciente}</strong></td>
+                <td style="color: #94a3b8;">Dr. ${data.nombreDoctor}</td>
+                <td><strong>${data.tipo_ejercicio.replace('_', ' ').toUpperCase()}</strong></td>
+                <td>${estadoBadge}</td>
+                <td><strong style="color: var(--text-main);">${data.reps_realizadas}</strong> / ${data.reps_meta}</td>
+            </tr>
+        `;
+    });
+}
 
 // Cerrar sesión
 document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -103,7 +180,9 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 auth.onAuthStateChanged(user => {
     if (user) {
         cargarUsuarios();
-        cargarBitacora();
+        cargarEstadisticas();
+        cargarBitacoraConFiltro();
+        cargarRutinasGlobales();
     } else {
         window.location.href = 'index.html';
     }
