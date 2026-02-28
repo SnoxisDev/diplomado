@@ -34,6 +34,8 @@
             text-transform: uppercase;
             font-size: 0.9rem;
         }
+        
+        /* Contenedor de filtros reparado */
         .filter-container {
             display: flex;
             flex-wrap: wrap;
@@ -44,13 +46,15 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--border);
+            width: 100%; /* Forzar a que no crezca de más */
+            box-sizing: border-box;
         }
         .filter-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
             flex: 1;
-            min-width: 150px;
+            min-width: 140px; /* Reducido un poco para móviles */
         }
         .filter-group label {
             font-size: 0.85rem;
@@ -59,30 +63,86 @@
         .filter-group input {
             margin-bottom: 0;
             padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .btn-filter {
-            background: var(--primary);
-            color: white;
+        .btn-filter, .btn-clear {
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             height: 42px;
+            white-space: nowrap; /* Evita que el texto se parta feo */
+        }
+        .btn-filter {
+            background: var(--primary);
+            color: white;
         }
         .btn-clear {
             background: transparent;
             color: var(--danger);
             border: 1px solid var(--danger);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            height: 42px;
         }
         .btn-clear:hover {
             background: var(--danger);
             color: white;
+        }
+
+        /* ==========================================
+           REPARACIÓN RESPONSIVE DEFINITIVA
+           ========================================== */
+        
+        /* Bloqueamos el tamaño máximo de las tarjetas para que no se estiren */
+        .card {
+            max-width: 100%;
+            overflow: hidden; /* Oculta todo lo que intente salir de la tarjeta */
+        }
+
+        /* Aseguramos que la tabla pida sus 700px pero solo por dentro */
+        table {
+            width: 100%;
+            min-width: 700px; 
+        }
+        
+        /* Contenedor mágico blindado */
+        .table-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 15px;
+            padding-bottom: 10px; /* Espacio para la barrita de scroll */
+        }
+
+        @media (max-width: 768px) {
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .btn-filter, .btn-clear {
+                width: 100%;
+                margin-top: 5px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            /* Los botones de pestañas se apilan en teléfonos muy pequeños */
+            .tabs-rutinas {
+                flex-direction: column;
+            }
+            .tabs-rutinas button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -120,13 +180,13 @@
             </div>
         </div>
 
-        <div class="grid-container" style="grid-template-columns: 1fr;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
             
             <div class="card">
-                <h3 style="color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                <h3 style="color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
                     <i class="fa-solid fa-users-gear"></i> Usuarios Registrados
                 </h3>
-                <div style="overflow-x: auto; margin-top: 15px;">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -142,8 +202,8 @@
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 20px;">
-                <h3 style="color: var(--warning); border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <div class="card">
+                <h3 style="color: var(--warning); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
                     <i class="fa-solid fa-clipboard-list"></i> Bitácora del Sistema
                 </h3>
                 
@@ -160,7 +220,7 @@
                     <button id="btn-limpiar-filtro" class="btn-clear"><i class="fa-solid fa-eraser"></i> Limpiar</button>
                 </div>
 
-                <div style="overflow-x: auto; margin-top: 15px;">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -176,18 +236,18 @@
                 </div>
             </div>
 
-           <div class="card" style="margin-top: 20px; grid-column: 1 / -1;">
-                <h3 style="color: #10b981; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <div class="card">
+                <h3 style="color: #10b981; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
                     <i class="fa-solid fa-globe"></i> Control Global de Rutinas
                 </h3>
                 
-                <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
-                    <button onclick="filtrarEstadoGlobal('todas')" class="btn" style="background: #334155; color: white; font-size: 0.8rem;">Todas</button>
-                    <button onclick="filtrarEstadoGlobal('pendiente')" class="btn" style="background: var(--warning); color: black; font-size: 0.8rem;">Solo Pendientes</button>
-                    <button onclick="filtrarEstadoGlobal('completado')" class="btn" style="background: var(--success); color: white; font-size: 0.8rem;">Solo Completadas</button>
+                <div class="tabs-rutinas" style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="filtrarEstadoGlobal('todas')" class="btn" style="background: #334155; color: white; font-size: 0.8rem; flex-grow: 1;">Todas</button>
+                    <button onclick="filtrarEstadoGlobal('pendiente')" class="btn" style="background: var(--warning); color: black; font-size: 0.8rem; flex-grow: 1;">Solo Pendientes</button>
+                    <button onclick="filtrarEstadoGlobal('completado')" class="btn" style="background: var(--success); color: white; font-size: 0.8rem; flex-grow: 1;">Solo Completadas</button>
                 </div>
 
-                <div style="overflow-x: auto;">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -202,6 +262,9 @@
                             <tr><td colspan="5">Cargando rutinas y nombres del hospital...</td></tr>
                         </tbody>
                     </table>
+                </div>
+                
+                <div id="paginacionRutinas" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding-bottom: 10px; flex-wrap: wrap;">
                 </div>
             </div>
 
