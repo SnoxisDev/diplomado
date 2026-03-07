@@ -107,18 +107,26 @@ async function loadAssignments(user) {
         
         const div = document.createElement('div');
         div.className = 'task-card';
-        // Estilos inline para asegurar diseño sin CSS extra
-        div.style = "background: white; padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;";
+        // Quitamos el fondo blanco fijo para que use tu Dark Mode, y le dejamos la línea azul a la izquierda
+        div.style = "border-left: 5px solid var(--primary);"; 
         
         div.innerHTML = `
             <div>
-                <h3 style="margin:0; color:#333;">${nombreEj}</h3>
-                <p style="margin:5px 0; color:#666">Meta: <strong>${data.reps_meta} repeticiones</strong></p>
+                <h3 style="margin:0; color:var(--text-main);">${nombreEj}</h3>
+                <p style="margin:5px 0; color:var(--text-muted)">Meta: <strong style="color:var(--text-main);">${data.reps_meta} repeticiones</strong></p>
             </div>
-            <button onclick="window.location.href='monitor.html?id=${docSnap.id}&meta=${data.reps_meta}&tipo=${data.tipo_ejercicio}'" 
-                style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">
-                ▶ COMENZAR
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                
+                <button onclick="window.location.href='biblioteca.html?ver=${data.tipo_ejercicio}'" 
+                    style="background:transparent; color:var(--primary); border:1px solid var(--primary); padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:5px; transition: 0.3s;">
+                    <i class="fa-solid fa-video"></i> Tutorial
+                </button>
+
+                <button onclick="window.location.href='monitor.html?id=${docSnap.id}&meta=${data.reps_meta}&tipo=${data.tipo_ejercicio}'" 
+                    style="background:var(--success); color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:5px;">
+                    <i class="fa-solid fa-play"></i> Iniciar
+                </button>
+            </div>
         `;
         exercisesList.appendChild(div);
     });
