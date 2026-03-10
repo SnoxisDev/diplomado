@@ -2,39 +2,31 @@ import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Referencias al HTML (Adaptadas al Nuevo Diseño)
 const authForm = document.getElementById('authForm');
-const toggleBtn = document.getElementById('toggleBtn');     // Enlace de texto abajo
-const toggleText = document.getElementById('toggleText');   // Texto "¿No tienes cuenta?"
-const registerFields = document.getElementById('registerFields'); // Campos extra
+const toggleBtn = document.getElementById('toggleBtn');
+const toggleText = document.getElementById('toggleText');
+const registerFields = document.getElementById('registerFields');
 
 let isRegistering = false; 
 
-// 1. ALTERNAR MODO (Login <-> Registro)
 toggleBtn.addEventListener('click', (e) => {
-    e.preventDefault(); // Evita que el enlace recargue la página
+    e.preventDefault();
     isRegistering = !isRegistering;
-
-    const btnSubmit = authForm.querySelector('button'); // El botón principal
+    const btnSubmit = authForm.querySelector('button');
 
     if (isRegistering) {
-        // MODO REGISTRO
-        registerFields.style.display = 'block'; // Mostrar campos
+        registerFields.style.display = 'block';
         toggleText.innerText = "¿Ya tienes cuenta?";
         toggleBtn.innerText = "Inicia Sesión aquí";
-        // Cambiar botón con icono de FontAwesome
         btnSubmit.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Cuenta';
     } else {
-        // MODO LOGIN
-        registerFields.style.display = 'none'; // Ocultar campos
+        registerFields.style.display = 'none';
         toggleText.innerText = "¿No tienes cuenta?";
         toggleBtn.innerText = "Regístrate aquí";
-        // Cambiar botón con icono de FontAwesome
         btnSubmit.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
     }
 });
 
-// 2. MANEJAR ENVÍO
 authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -42,24 +34,20 @@ authForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
     const btnSubmit = authForm.querySelector('button');
 
-    // Feedback visual (Cargando...)
     const originalText = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
     btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
 
     try {
         if (isRegistering) {
-            // --- REGISTRO ---
             const nombre = document.getElementById('nombre').value;
             const rol = document.getElementById('rol').value;
 
             if(!nombre) throw new Error("El nombre es obligatorio");
 
-            // Crear usuario
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Guardar en Firestore
             await setDoc(doc(db, "users", user.uid), {
                 nombre: nombre,
                 email: email,
@@ -67,54 +55,63 @@ authForm.addEventListener('submit', async (e) => {
                 fecha_registro: new Date()
             });
 
-            alert(`✅ ¡Bienvenido, ${nombre}!`);
-            redirigir(rol);
+            // ALERTA SWEETALERT: Registro Exitoso
+            Swal.fire({
+                title: '¡Registro Exitoso!',
+                text: `Bienvenido a SIRA, ${nombre}`,
+                icon: 'success',
+                confirmButtonColor: '#3b82f6'
+            }).then(() => {
+                redirigir(rol);
+            });
 
        } else {
-            // --- LOGIN ---
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // ==========================================
-            // NUEVO: VERIFICACIÓN DE ADMINISTRADOR
-            // ==========================================
             if (user.email === "admin@gmail.com") {
-                alert("¡Bienvenido al Panel de Administración!");
-                window.location.href = "dashboard-admin.html";
-                return; // Detiene el código aquí para que no busque rol de doctor/paciente
+                // ALERTA SWEETALERT: Admin Login
+                Swal.fire({
+                    title: '¡Hola Admin!',
+                    text: 'Accediendo al panel de control...',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "dashboard-admin.html";
+                });
+                return; 
             }
-            // ==========================================
 
-            // Buscar rol si NO es el administrador
             const docSnap = await getDoc(doc(db, "users", user.uid));
             
             if (docSnap.exists()) {
-                const data = docSnap.data();
-                redirigir(data.rol);
+                redirigir(docSnap.data().rol);
             } else {
-                alert("Error: Usuario sin datos.");
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = originalText;
+                throw new Error("Usuario sin datos en la base de datos.");
             }
         }
     } catch (error) {
         console.error(error);
         
-        // Mensajes de error amigables
         let msg = error.message;
         if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
         if (error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
         if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil (mínimo 6 caracteres).";
 
-        alert("❌ " + msg);
+        // ALERTA SWEETALERT: Error
+        Swal.fire({
+            title: 'Acceso Denegado',
+            text: msg,
+            icon: 'error',
+            confirmButtonColor: '#ef4444'
+        });
         
-        // Restaurar botón
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = originalText;
     }
 });
 
-// Función simple para mover al usuario
 function redirigir(rol) {
     if (rol === 'doctor') {
         window.location.href = 'dashboard-dr.html';

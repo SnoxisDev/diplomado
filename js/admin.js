@@ -45,44 +45,76 @@ async function cargarUsuarios() {
 }
 
 window.cambiarRol = async (userId, nombre, rolActual) => {
-    const nuevoRol = prompt(`Cambiar rol de: ${nombre}\nRol actual: ${rolActual}\n\nEscribe 'doctor' o 'paciente' para cambiarlo:`, rolActual);
-    if (nuevoRol && (nuevoRol.toLowerCase() === 'doctor' || nuevoRol.toLowerCase() === 'paciente') && nuevoRol.toLowerCase() !== rolActual) {
+    // ALERTA SWEETALERT: Selector de Rol Moderno
+    const { value: nuevoRol } = await Swal.fire({
+        title: `Cambiar rol de ${nombre}`,
+        text: `Rol actual: ${rolActual.toUpperCase()}`,
+        icon: 'question',
+        input: 'select',
+        inputOptions: {
+            'doctor': '👨‍⚕️ Doctor',
+            'paciente': '🤕 Paciente'
+        },
+        inputValue: rolActual,
+        showCancelButton: true,
+        confirmButtonText: 'Actualizar Rol',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f59e0b'
+    });
+
+    if (nuevoRol && nuevoRol !== rolActual) {
         try {
-            await updateDoc(doc(db, "users", userId), { rol: nuevoRol.toLowerCase() });
+            await updateDoc(doc(db, "users", userId), { rol: nuevoRol });
             await addDoc(collection(db, "bitacora"), {
                 fecha: new Date(),
                 usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
                 accion: "CAMBIO DE ROL",
-                detalle: `El Administrador cambió el rol de ${nombre} a ${nuevoRol.toLowerCase()}`
+                detalle: `El Administrador cambió el rol de ${nombre} a ${nuevoRol}`
             });
-            alert(`✅ Rol actualizado con éxito.`);
+            
+            // ALERTA SWEETALERT: Éxito
+            Swal.fire('¡Actualizado!', 'El rol ha sido cambiado exitosamente.', 'success');
+            
             cargarUsuarios(); 
             cargarEstadisticas(); 
             cargarBitacoraConFiltro();
         } catch (error) {
-            alert("❌ Error al cambiar rol: " + error.message);
+            Swal.fire('Error', error.message, 'error');
         }
-    } else if (nuevoRol && nuevoRol.toLowerCase() !== rolActual) {
-        alert("⚠️ Rol no válido. Escribe exactamente 'doctor' o 'paciente'.");
     }
 };
 
 window.eliminarUsuario = async (userId, nombre) => {
-    if (confirm(`¿Estás seguro de eliminar a ${nombre} de la base de datos? Esto es irreversible.`)) {
+    // ALERTA SWEETALERT: Confirmación Peligrosa
+    const result = await Swal.fire({
+        title: `¿Eliminar a ${nombre}?`,
+        text: "Esta acción borrará al usuario de la base de datos para siempre.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#334155',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
         try {
             await deleteDoc(doc(db, "users", userId));
-            alert("Usuario eliminado correctamente.");
-            cargarUsuarios(); 
-            cargarEstadisticas();
             await addDoc(collection(db, "bitacora"), {
                 fecha: new Date(),
                 usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
                 accion: "USUARIO ELIMINADO",
                 detalle: `El Administrador eliminó del sistema al usuario: ${nombre}`
             });
+            
+            // ALERTA SWEETALERT: Eliminado
+            Swal.fire('¡Eliminado!', 'El usuario ha sido borrado.', 'success');
+            
+            cargarUsuarios(); 
+            cargarEstadisticas();
             cargarBitacoraConFiltro();
         } catch (error) {
-            alert("Error al eliminar: " + error.message);
+            Swal.fire('Error', error.message, 'error');
         }
     }
 };
