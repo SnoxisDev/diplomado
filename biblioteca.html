@@ -119,25 +119,25 @@
                 </div>
             </div>
 
-            <div class="card card-clickable" onclick="abrirModal('modal-sentadilla')" style="padding: 0; overflow: hidden; text-align: center;">
-                <div style="height: 150px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #10b981;">
-                    <i class="fa-solid fa-person-running"></i>
+           <div class="card card-clickable" onclick="abrirModal('modal-elevacion_lateral')" style="padding: 0; overflow: hidden; text-align: center;">
+                <div style="height: 150px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #f59e0b;">
+                    <i class="fa-solid fa-person-arrow-up-from-line"></i>
                 </div>
                 <div style="padding: 20px;">
-                    <span class="badge badge-leg">Tren Inferior</span>
-                    <h3 style="margin-top: 5px; margin-bottom: 15px;">Sentadilla (Squat)</h3>
-                    <button class="btn-primary" style="width: 100%; background: var(--success);"><i class="fa-solid fa-eye"></i> Ver Explicación</button>
+                    <span class="badge badge-arm" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Hombro / Manguito</span>
+                    <h3 style="margin-top: 5px; margin-bottom: 15px;">Elevación Lateral</h3>
+                    <button class="btn-primary" style="width: 100%; background: var(--warning); color: black;"><i class="fa-solid fa-eye"></i> Ver Explicación</button>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <div id="modal-flexion_codo" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-flexion_codo')">
+    <div id="modal-elevacion_lateral" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-elevacion_lateral')">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="margin: 0; color: var(--primary);">Flexión de Codo</h3>
-                <button class="btn-close" onclick="cerrarModal('modal-flexion_codo')"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="margin: 0; color: var(--warning);">Elevación Lateral</h3>
+                <button class="btn-close" onclick="cerrarModal('modal-elevacion_lateral')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 
@@ -145,33 +145,33 @@
                 
                 <div class="step-box">
                     <div class="step-number">1</div>
-                    <img src="img/biceps-paso1.jpg" alt="Paso 1" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+1'">
+                    <img src="img/hombro-paso1.jpg" alt="Paso 1" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+1'">
                     <div>
                         <strong style="color: var(--text-main);">Posición Inicial</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Ponte de frente a la cámara. Extiende el brazo por completo hacia abajo.</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Ponte de frente a la cámara. Deja los brazos colgando rectos a los lados de tu cuerpo.</p>
                     </div>
                 </div>
 
                 <div class="step-box">
                     <div class="step-number">2</div>
-                    <img src="img/biceps-paso2.jpg" alt="Paso 2" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+2'">
+                    <img src="img/hombro-paso2.jpg" alt="Paso 2" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+2'">
                     <div>
-                        <strong style="color: var(--text-main);">Ejecución</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Dobla el codo subiendo la mano hacia tu hombro, sin mover la espalda.</p>
+                        <strong style="color: var(--text-main);">El Ascenso</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Levanta el brazo estirado hacia un lado (como un ala) hasta llegar a la altura de tu hombro.</p>
                     </div>
                 </div>
 
                 <div class="tip-box">
                     <i class="fa-regular fa-lightbulb"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
-                    Para que el sistema cuente la repetición, asegúrate de estirar el brazo casi por completo (ángulo de 160°) al bajar.
+                    El sistema medirá el ángulo desde tu cadera. Debes subir el brazo hasta llegar casi a los 90° (paralelo al suelo) para que cuente como válido.
                 </div>
 
                 <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-instagram"></i> Video Demostrativo</h4>
                 
-                <div class="video-wrapper">
+                <div class="video-wrapper" style="border-color: var(--warning);">
                     <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.9rem; text-align: center; padding: 20px;">
                         <i class="fa-solid fa-video" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                        Espacio para el Video de Instagram
+                        Espacio para el Video
                     </div>
                 </div>
 

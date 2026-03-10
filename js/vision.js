@@ -103,27 +103,31 @@ function procesarEjercicio(landmarks) {
         }
     } 
     
-    // --- SENTADILLA ---
-    else if (EXERCISE_TYPE.includes("sentadilla")) {
-        const hip = landmarks[24];
-        const knee = landmarks[26];
-        const ankle = landmarks[28];
+    // --- ELEVACIÓN LATERAL (HOMBRO) ---
+    else if (EXERCISE_TYPE.includes("elevacion") || EXERCISE_TYPE.includes("lateral")) {
+        // Usamos el lado derecho del cuerpo por defecto
+        const hip = landmarks[24];      // Cadera
+        const shoulder = landmarks[12]; // Hombro
+        const elbow = landmarks[14];    // Codo
 
-        if (hip.visibility > 0.5 && knee.visibility > 0.5 && ankle.visibility > 0.5) {
-            angle = calculateAngle(hip, knee, ankle);
-            jointCoordinates = knee;
+        if (hip.visibility > 0.5 && shoulder.visibility > 0.5 && elbow.visibility > 0.5) {
+            // Calculamos el ángulo en la axila
+            angle = calculateAngle(hip, shoulder, elbow);
+            jointCoordinates = shoulder; // Pintar el número amarillo en el hombro
 
-            if (angle > 165) {
+            // Si sube el brazo casi a nivel del hombro (aprox 80-90 grados)
+            if (angle > 75) {
                 stage = "up";
-                lblFeedback.innerText = "Baja la cadera 👇";
+                lblFeedback.innerText = "Baja el brazo 👇";
             }
-            if (angle < 100 && stage === "up") {
+            // Si regresa el brazo pegado al cuerpo (menos de 25 grados)
+            if (angle < 25 && stage === "up") {
                 stage = "down";
                 count++;
-                lblFeedback.innerText = "¡Arriba! 🦵";
+                lblFeedback.innerText = "¡Sube el brazo! 🕊️";
             }
         } else {
-            lblFeedback.innerText = "⚠️ Necesito ver tu cuerpo completo";
+            lblFeedback.innerText = "⚠️ Aléjate un poco, necesito ver tu torso";
         }
     }
 
