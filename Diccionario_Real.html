@@ -20,26 +20,20 @@
         <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
     </tr>
     <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
-    <tr>
-        <td colspan="5" class="text-left"><b>Nombre:</b> users</td>
-        <td colspan="6" class="text-left"><b>Alias:</b> Usuarios</td>
-    </tr>
-    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Colección real de Firebase donde se almacenan los datos de perfil y roles (Auth).</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> users</td><td colspan="6" class="text-left"><b>Alias:</b> Usuarios</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Almacena los datos personales, roles y credenciales de acceso.</td></tr>
     
     <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
     <tr style="font-weight: bold;">
         <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
     </tr>
-    <tr><td>1</td><td>uid</td><td>ID Usuario</td><td>Document ID autogenerado de Firebase</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>2</td><td>nombre</td><td>Nombre</td><td>Nombre ingresado en el registro</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>3</td><td>email</td><td>Correo</td><td>Correo de autenticación</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>4</td><td>rol</td><td>Rol</td><td>Define si es paciente, doctor o admin</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>1</td><td>uid</td><td>ID Usuario</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>nombre</td><td>Nombre</td><td>Nombre del usuario</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>email</td><td>Correo</td><td>Correo electrónico de acceso</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>rol</td><td>Rol</td><td>doctor, paciente o admin</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
     <tr><td>5</td><td>telefono</td><td>Teléfono</td><td>Guardado desde perfil.js</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
-    <tr><td>6</td><td>cedula</td><td>Cédula</td><td>Guardado desde perfil.js</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
-    <tr><td>7</td><td>fechaNacimiento</td><td>Fecha Nac.</td><td>Guardado desde perfil.js (Input Date)</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
-    <tr><td>8</td><td>genero</td><td>Género</td><td>Guardado desde perfil.js</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
-    <tr><td>9</td><td>photoUrl</td><td>Foto Perfil</td><td>Enlace a imagen del avatar</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
-    <tr><td>10</td><td>fecha_registro</td><td>Fecha Ingreso</td><td>Timestamp de creación en auth.js</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>6</td><td>cedula</td><td>Cédula</td><td>Documento de identidad</td><td>String</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
+    <tr><td>7</td><td>fecha_registro</td><td>Fecha Ingreso</td><td>Momento de creación de cuenta</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
 </table>
 
 <table>
@@ -50,30 +44,25 @@
         <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
     </tr>
     <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
-    <tr>
-        <td colspan="5" class="text-left"><b>Nombre:</b> requests</td>
-        <td colspan="6" class="text-left"><b>Alias:</b> Solicitudes</td>
-    </tr>
-    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Colección real de Firebase que enlaza a un paciente con un doctor (paciente.js).</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> requests</td><td colspan="6" class="text-left"><b>Alias:</b> Solicitudes</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Solicitudes de pacientes para ser atendidos por un doctor.</td></tr>
     
     <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
     <tr style="font-weight: bold;">
         <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
     </tr>
-    <tr><td>1</td><td>id</td><td>ID Solicitud</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>2</td><td>id_doctor</td><td>ID Doctor</td><td>UID del doctor que recibe la solicitud</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>3</td><td>nombre_doctor</td><td>Nom Doctor</td><td>Nombre cacheado del doctor</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>4</td><td>id_paciente</td><td>ID Paciente</td><td>UID del paciente que envía</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>5</td><td>nombre_paciente</td><td>Nom Paciente</td><td>Nombre cacheado del paciente</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>6</td><td>estado</td><td>Estatus</td><td>'pendiente', 'aceptado', 'rechazado'</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td>'pendiente'</td><td>10/03/2026</td></tr>
-    <tr><td>7</td><td>fecha</td><td>Fecha Envío</td><td>Momento en que se envió la solicitud</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>1</td><td>id</td><td>ID Petición</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>id_paciente</td><td>ID Paciente</td><td>UID del paciente solicitante</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>id_doctor</td><td>ID Doctor</td><td>UID del doctor receptor</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>estado</td><td>Estatus</td><td>'pendiente', 'aceptado', 'rechazado'</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td>'pendiente'</td><td>10/03/2026</td></tr>
+    <tr><td>5</td><td>fecha</td><td>Fecha Envío</td><td>Momento del envío</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
 
     <tr><td colspan="11" class="bg-gray">Información Claves Foráneas</td></tr>
     <tr style="font-weight: bold;">
         <td colspan="3">Nombre Clave</td><td colspan="3">Tabla Foránea</td><td colspan="2">Campo en tabla padre</td><td colspan="3">Campo en tabla foránea</td>
     </tr>
-    <tr><td colspan="3">Ref_Doctor</td><td colspan="3">users</td><td colspan="2">id_doctor</td><td colspan="3">uid</td></tr>
-    <tr><td colspan="3">Ref_Paciente</td><td colspan="3">users</td><td colspan="2">id_paciente</td><td colspan="3">uid</td></tr>
+    <tr><td colspan="3">Ref_Paciente_Req</td><td colspan="3">users</td><td colspan="2">id_paciente</td><td colspan="3">uid</td></tr>
+    <tr><td colspan="3">Ref_Doctor_Req</td><td colspan="3">users</td><td colspan="2">id_doctor</td><td colspan="3">uid</td></tr>
 </table>
 
 <table>
@@ -84,63 +73,114 @@
         <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
     </tr>
     <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
-    <tr>
-        <td colspan="5" class="text-left"><b>Nombre:</b> assignments</td>
-        <td colspan="6" class="text-left"><b>Alias:</b> Rutinas</td>
-    </tr>
-    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Colección real de Firebase con los ejercicios asignados y monitoreados por la IA.</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> assignments</td><td colspan="6" class="text-left"><b>Alias:</b> Rutinas</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Rutinas terapéuticas recetadas por el doctor a un paciente.</td></tr>
     
     <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
     <tr style="font-weight: bold;">
         <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
     </tr>
     <tr><td>1</td><td>id</td><td>ID Rutina</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>2</td><td>id_doctor</td><td>ID Doctor</td><td>UID del doctor que receta</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>3</td><td>id_paciente</td><td>ID Paciente</td><td>UID del paciente que la hace</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>4</td><td>tipo_ejercicio</td><td>Terapia</td><td>'flexion_codo' o 'elevacion_lateral'</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>5</td><td>reps_meta</td><td>Meta</td><td>Repeticiones exigidas por el doctor</td><td>Number</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>6</td><td>reps_realizadas</td><td>Reps IA</td><td>Conteo actualizado por vision.js</td><td>Number</td><td>N/A</td><td></td><td></td><td>X</td><td>0</td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>id_paciente</td><td>ID Paciente</td><td>UID del paciente</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>id_doctor</td><td>ID Doctor</td><td>UID del médico</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>tipo_ejercicio</td><td>Terapia</td><td>Ej: 'flexion_codo'</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>5</td><td>reps_meta</td><td>Meta</td><td>Repeticiones exigidas</td><td>Number</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>6</td><td>reps_realizadas</td><td>Reps IA</td><td>Conteo detectado por la cámara</td><td>Number</td><td>N/A</td><td></td><td></td><td>X</td><td>0</td><td>10/03/2026</td></tr>
     <tr><td>7</td><td>estado</td><td>Estado</td><td>'pendiente' o 'completado'</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td>'pendiente'</td><td>10/03/2026</td></tr>
-    <tr><td>8</td><td>fecha</td><td>Fecha Asig.</td><td>Momento en que se asignó</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>9</td><td>fecha_completado</td><td>Fecha Comp.</td><td>Guardada por vision.js al finalizar</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
+    <tr><td>8</td><td>fecha</td><td>Fecha</td><td>Fecha de asignación</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>9</td><td>fecha_completado</td><td>Fecha Fin</td><td>Fecha de finalización real</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td></td><td></td><td>10/03/2026</td></tr>
 
     <tr><td colspan="11" class="bg-gray">Información Claves Foráneas</td></tr>
     <tr style="font-weight: bold;">
         <td colspan="3">Nombre Clave</td><td colspan="3">Tabla Foránea</td><td colspan="2">Campo en tabla padre</td><td colspan="3">Campo en tabla foránea</td>
     </tr>
-    <tr><td colspan="3">Ref_Rutina_Doctor</td><td colspan="3">users</td><td colspan="2">id_doctor</td><td colspan="3">uid</td></tr>
-    <tr><td colspan="3">Ref_Rutina_Paciente</td><td colspan="3">users</td><td colspan="2">id_paciente</td><td colspan="3">uid</td></tr>
+    <tr><td colspan="3">Ref_Paciente_Asig</td><td colspan="3">users</td><td colspan="2">id_paciente</td><td colspan="3">uid</td></tr>
+    <tr><td colspan="3">Ref_Doctor_Asig</td><td colspan="3">users</td><td colspan="2">id_doctor</td><td colspan="3">uid</td></tr>
 </table>
 
 <table>
     <tr><td colspan="11" class="bg-gray">Información General</td></tr>
     <tr>
-        <td colspan="4" class="text-left"><b>Módulo:</b> Seguridad y Auditoría</td>
+        <td colspan="4" class="text-left"><b>Módulo:</b> Seguridad</td>
         <td colspan="4" class="text-left"><b>Fecha de Creación:</b> 10/03/2026</td>
         <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
     </tr>
     <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
-    <tr>
-        <td colspan="5" class="text-left"><b>Nombre:</b> bitacora</td>
-        <td colspan="6" class="text-left"><b>Alias:</b> Auditoría</td>
-    </tr>
-    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Colección real para el registro inmutable de acciones críticas (admin.js, doctor.js).</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> bitacora</td><td colspan="6" class="text-left"><b>Alias:</b> Auditoría</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Registro inmutable de acciones en el sistema.</td></tr>
     
     <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
     <tr style="font-weight: bold;">
         <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
     </tr>
     <tr><td>1</td><td>id</td><td>ID Log</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>2</td><td>fecha</td><td>Momento</td><td>Fecha y hora del evento</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>3</td><td>usuario_id</td><td>Ejecutor</td><td>UID de quien realizó la acción</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>4</td><td>accion</td><td>Acción</td><td>Ej: CAMBIO DE ROL, USUARIO ELIMINADO</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
-    <tr><td>5</td><td>detalle</td><td>Contexto</td><td>Descripción técnica de lo que ocurrió</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>usuario_id</td><td>Ejecutor</td><td>UID del usuario actuante</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>accion</td><td>Acción</td><td>Nombre del evento</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>detalle</td><td>Contexto</td><td>Descripción técnica</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>5</td><td>fecha</td><td>Fecha</td><td>Momento del suceso</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
 
     <tr><td colspan="11" class="bg-gray">Información Claves Foráneas</td></tr>
     <tr style="font-weight: bold;">
         <td colspan="3">Nombre Clave</td><td colspan="3">Tabla Foránea</td><td colspan="2">Campo en tabla padre</td><td colspan="3">Campo en tabla foránea</td>
     </tr>
-    <tr><td colspan="3">Ref_Ejecutor</td><td colspan="3">users</td><td colspan="2">usuario_id</td><td colspan="3">uid</td></tr>
+    <tr><td colspan="3">Ref_Usuario_Log</td><td colspan="3">users</td><td colspan="2">usuario_id</td><td colspan="3">uid</td></tr>
+</table>
+
+<table>
+    <tr><td colspan="11" class="bg-gray">Información General</td></tr>
+    <tr>
+        <td colspan="4" class="text-left"><b>Módulo:</b> Alertas</td>
+        <td colspan="4" class="text-left"><b>Fecha de Creación:</b> 10/03/2026</td>
+        <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
+    </tr>
+    <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> notificaciones</td><td colspan="6" class="text-left"><b>Alias:</b> Campanita</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Mensajes enviados por doctores y visualizados en la campanita del paciente.</td></tr>
+    
+    <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
+    <tr style="font-weight: bold;">
+        <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
+    </tr>
+    <tr><td>1</td><td>id</td><td>ID Aviso</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>usuario_id</td><td>Receptor</td><td>UID de quien recibe el mensaje</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>titulo</td><td>Título</td><td>Asunto principal</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>mensaje</td><td>Mensaje</td><td>Cuerpo de la alerta</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>5</td><td>leida</td><td>Visto</td><td>Status de lectura</td><td>Boolean</td><td>N/A</td><td></td><td></td><td>X</td><td>false</td><td>10/03/2026</td></tr>
+    <tr><td>6</td><td>fecha</td><td>Fecha</td><td>Fecha de envío</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+
+    <tr><td colspan="11" class="bg-gray">Información Claves Foráneas</td></tr>
+    <tr style="font-weight: bold;">
+        <td colspan="3">Nombre Clave</td><td colspan="3">Tabla Foránea</td><td colspan="2">Campo en tabla padre</td><td colspan="3">Campo en tabla foránea</td>
+    </tr>
+    <tr><td colspan="3">Ref_Usuario_Notif</td><td colspan="3">users</td><td colspan="2">usuario_id</td><td colspan="3">uid</td></tr>
+</table>
+
+<table>
+    <tr><td colspan="11" class="bg-gray">Información General</td></tr>
+    <tr>
+        <td colspan="4" class="text-left"><b>Módulo:</b> Médico / Feedback</td>
+        <td colspan="4" class="text-left"><b>Fecha de Creación:</b> 10/03/2026</td>
+        <td colspan="3" class="text-left"><b>Fecha de Modificación:</b> 10/03/2026</td>
+    </tr>
+    <tr><td colspan="11" class="bg-gray">Información de la Tabla</td></tr>
+    <tr><td colspan="5" class="text-left"><b>Nombre:</b> evaluaciones_dolor</td><td colspan="6" class="text-left"><b>Alias:</b> Escala de Dolor</td></tr>
+    <tr><td colspan="11" class="text-left"><b>Descripción:</b> Nivel de dolor reportado (1 a 10) por el paciente tras finalizar su rutina.</td></tr>
+    
+    <tr><td colspan="11" class="bg-gray">Información de lo(s) Campos(s)</td></tr>
+    <tr style="font-weight: bold;">
+        <td>Id</td><td>Campo</td><td>Alias</td><td>Descripción</td><td>Tipo</td><td>Long.</td><td>Primary</td><td>Foreign</td><td>Not Null</td><td>Valor Defecto</td><td>Fecha Mod.</td>
+    </tr>
+    <tr><td>1</td><td>id</td><td>ID Eval</td><td>Document ID autogenerado</td><td>String</td><td>N/A</td><td>X</td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>2</td><td>id_asignacion</td><td>ID Rutina</td><td>Identificador de la sesión recetada</td><td>String</td><td>N/A</td><td></td><td>X</td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>3</td><td>tipo_ejercicio</td><td>Ejercicio</td><td>Ejercicio realizado</td><td>String</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+    <tr><td>4</td><td>nivel_dolor</td><td>Dolor 1-10</td><td>Valor en la escala de EVA</td><td>Number</td><td>N/A</td><td></td><td></td><td>X</td><td>1</td><td>10/03/2026</td></tr>
+    <tr><td>5</td><td>fecha</td><td>Fecha</td><td>Momento del reporte</td><td>Timestamp</td><td>N/A</td><td></td><td></td><td>X</td><td></td><td>10/03/2026</td></tr>
+
+    <tr><td colspan="11" class="bg-gray">Información Claves Foráneas</td></tr>
+    <tr style="font-weight: bold;">
+        <td colspan="3">Nombre Clave</td><td colspan="3">Tabla Foránea</td><td colspan="2">Campo en tabla padre</td><td colspan="3">Campo en tabla foránea</td>
+    </tr>
+    <tr><td colspan="3">Ref_Asig_Dolor</td><td colspan="3">assignments</td><td colspan="2">id_asignacion</td><td colspan="3">id</td></tr>
 </table>
 
 </body>

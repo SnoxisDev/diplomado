@@ -9,6 +9,7 @@ const exercisesList = document.getElementById('exercisesList');
 
 // Verificar Estado del Paciente
 async function checkStatus(user) {
+    cargarNotificaciones(user.uid);
     // 1. Obtener nombre del paciente
     const userDoc = await getDoc(doc(db, "users", user.uid));
     let pacienteNombre = "Paciente";
@@ -231,3 +232,34 @@ window.dejarDoctor = async (reqId) => {
         }
     }
 }
+
+// 🌟 NUEVO: CARGAR NOTIFICACIONES EN LA CAMPANITA
+async function cargarNotificaciones(uid) {
+    const q = query(collection(db, "notificaciones"), where("usuario_id", "==", uid));
+    const snap = await getDocs(q);
+    
+    const dropdown = document.getElementById('requestsList'); // El contenedor dentro de la campanita
+    const badge = document.getElementById('notificationBadge');
+    
+    if (!snap.empty) {
+        dropdown.innerHTML = "";
+        badge.style.display = "block"; // Encender el puntito rojo
+        
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            dropdown.innerHTML += `
+                <div style="padding:15px; border-bottom:1px solid #334155; color: white;">
+                    <strong style="color: var(--primary);">${data.titulo}</strong><br>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">${data.mensaje}</span>
+                </div>
+            `;
+        });
+    }
+}
+
+// Para que funcione el clic en la campanita
+document.getElementById('bellBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const menu = document.getElementById('dropdownMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+});

@@ -258,11 +258,21 @@ document.getElementById('assignForm').addEventListener('submit', async (e) => {
             reps_realizadas: 0
         });
 
+        // 🌟 NUEVO: ENVIAR NOTIFICACIÓN AL PACIENTE
+    await addDoc(collection(db, "notificaciones"), {
+        usuario_id: selectedPatientId,
+        titulo: "¡Nueva Rutina Asignada!",
+        mensaje: `El doctor te ha enviado ${reps} repeticiones de ${ex}.`,
+        leida: false,
+        fecha: new Date()
+    });
+
         await registrarBitacora("ASIGNAR RUTINA", `Se asignó ${ex} (${reps} reps) al paciente ID: ${selectedPatientId}`);
         
         Swal.fire('¡Rutina Enviada!', 'El paciente ya puede ver su nueva tarea.', 'success');
     } catch (error) {
-        Swal.fire('Error', 'Hubo un problema al asignar la rutina.', 'error');
+        console.error("🔥 EL ERROR REAL ES:", error);
+        Swal.fire('Error técnico', error.message, 'error');
     }
     
     btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Enviar Rutina';
