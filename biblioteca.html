@@ -72,16 +72,18 @@
             background: #334155; /* Placeholder mientras pones las fotos reales */
         }
 
-        /* Video tipo Instagram/TikTok */
-        .video-wrapper {
-            width: 100%; max-width: 280px; margin: 20px auto 0 auto;
-            aspect-ratio: 9/16; /* Formato vertical de celular */
-            background: #000; border-radius: 16px; overflow: hidden;
+        /* Video tipo YouTube (Horizontal 16:9) */
+        .video-wrapper-yt {
+            width: 100%; max-width: 450px; margin: 20px auto 0 auto;
+            aspect-ratio: 16/9; /* Formato horizontal clásico de YouTube */
+            background: #000; border-radius: 12px; overflow: hidden;
             border: 3px solid var(--primary);
             position: relative;
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
-        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; }
+        .video-wrapper-yt iframe {
+            width: 100%; height: 100%; border: none;
+        }
         
         /* Tip de la IA */
         .tip-box {
@@ -133,6 +135,49 @@
         </div>
     </div>
 
+    <div id="modal-flexion_codo" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-flexion_codo')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin: 0; color: var(--primary);">Flexión de Codo (Bíceps)</h3>
+                <button class="btn-close" onclick="cerrarModal('modal-flexion_codo')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                
+                <h4 style="margin-top: 0;">Fases del Movimiento:</h4>
+                
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--primary);">1</div>
+                    <img src="img/biceps-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+1'">
+                    <div>
+                        <strong style="color: var(--text-main);">Fase Excéntrica (Abajo)</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Brazo completamente extendido hacia abajo. El ángulo del codo debe ser mayor a 160°.</p>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--primary);">2</div>
+                    <img src="img/biceps-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+2'">
+                    <div>
+                        <strong style="color: var(--text-main);">Fase Concéntrica (Arriba)</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Sube el antebrazo contrayendo el bíceps hasta que el ángulo sea menor a 45°.</p>
+                    </div>
+                </div>
+
+                <div class="tip-box" style="border-left-color: var(--primary); background: rgba(59, 130, 246, 0.1); color: #60a5fa;">
+                    <i class="fa-solid fa-robot"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
+                    Asegúrate de ponerte de perfil (de lado) a la cámara para que el sistema pueda leer correctamente el ángulo de tu codo.
+                </div>
+
+                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video</h4>
+                
+                <div class="video-wrapper-yt" style="border-color: var(--primary);">
+                    <iframe src="https://www.youtube.com/embed/ykJmrZ5v0Oo?rel=0" title="Tutorial Bíceps" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <div id="modal-elevacion_lateral" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-elevacion_lateral')">
         <div class="modal-content">
             <div class="modal-header">
@@ -141,11 +186,11 @@
             </div>
             <div class="modal-body">
                 
-                <h4 style="margin-top: 0;">Paso a Paso:</h4>
+                <h4 style="margin-top: 0;">Fases del Movimiento:</h4>
                 
                 <div class="step-box">
-                    <div class="step-number">1</div>
-                    <img src="img/hombro-paso1.jpg" alt="Paso 1" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+1'">
+                    <div class="step-number" style="background: var(--warning); color: black;">1</div>
+                    <img src="img/hombro-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+1'">
                     <div>
                         <strong style="color: var(--text-main);">Posición Inicial</strong>
                         <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Ponte de frente a la cámara. Deja los brazos colgando rectos a los lados de tu cuerpo.</p>
@@ -153,78 +198,28 @@
                 </div>
 
                 <div class="step-box">
-                    <div class="step-number">2</div>
-                    <img src="img/hombro-paso2.jpg" alt="Paso 2" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+2'">
+                    <div class="step-number" style="background: var(--warning); color: black;">2</div>
+                    <img src="img/hombro-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+2'">
                     <div>
                         <strong style="color: var(--text-main);">El Ascenso</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Levanta el brazo estirado hacia un lado (como un ala) hasta llegar a la altura de tu hombro.</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Levanta los brazos estirados hacia los lados hasta llegar casi a la altura de tus hombros (90°).</p>
                     </div>
                 </div>
 
                 <div class="tip-box">
-                    <i class="fa-regular fa-lightbulb"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
-                    El sistema medirá el ángulo desde tu cadera. Debes subir el brazo hasta llegar casi a los 90° (paralelo al suelo) para que cuente como válido.
+                    <i class="fa-solid fa-robot"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
+                    El sistema medirá el ángulo desde tu cadera. Debes subir el brazo hasta llegar a los 75° o 90° para que cuente como válido.
                 </div>
 
-                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-instagram"></i> Video Demostrativo</h4>
+                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video</h4>
                 
-                <div class="video-wrapper" style="border-color: var(--warning);">
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.9rem; text-align: center; padding: 20px;">
-                        <i class="fa-solid fa-video" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                        Espacio para el Video
-                    </div>
+                <div class="video-wrapper-yt" style="border-color: var(--warning);">
+                    <iframe src="https://www.youtube.com/embed/WJm9OqOGpsm?rel=0" title="Tutorial Elevación Lateral" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
 
             </div>
         </div>
     </div>
-
-    <div id="modal-sentadilla" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-sentadilla')">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 style="margin: 0; color: var(--success);">Sentadilla (Squat)</h3>
-                <button class="btn-close" onclick="cerrarModal('modal-sentadilla')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body">
-                
-                <h4 style="margin-top: 0;">Paso a Paso:</h4>
-                
-                <div class="step-box">
-                    <div class="step-number">1</div>
-                    <img src="img/sentadilla-paso1.jpg" alt="Paso 1" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+1'">
-                    <div>
-                        <strong style="color: var(--text-main);">Posición Inicial</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Aléjate 2 metros de la cámara y ponte de <b>PERFIL (de lado)</b>. Espalda recta.</p>
-                    </div>
-                </div>
-
-                <div class="step-box">
-                    <div class="step-number">2</div>
-                    <img src="img/sentadilla-paso2.jpg" alt="Paso 2" class="step-img" onerror="this.src='https://placehold.co/80x80/334155/FFF?text=Foto+2'">
-                    <div>
-                        <strong style="color: var(--text-main);">El Descenso</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Baja la cadera como si fueras a sentarte en una silla invisible.</p>
-                    </div>
-                </div>
-
-                <div class="tip-box">
-                    <i class="fa-regular fa-lightbulb"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
-                    Tienes que bajar lo suficiente hasta que tus rodillas formen un ángulo de 90° para que cuente como válida.
-                </div>
-
-                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-instagram"></i> Video Demostrativo</h4>
-                
-                <div class="video-wrapper" style="border-color: var(--success);">
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.9rem; text-align: center; padding: 20px;">
-                        <i class="fa-solid fa-video" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                        Espacio para el Video de Instagram
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
 
     <script>
         // Función para abrir la ventana
