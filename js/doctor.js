@@ -200,43 +200,71 @@ async function loadMyPatients() {
 }
 
 window.desvincular = async (id) => {
-    if(confirm("¿Eliminar paciente?")) { 
+    const result = await Swal.fire({
+        title: '¿Eliminar paciente?',
+        text: "Dejarás de ver su progreso y no podrás asignarle más rutinas.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#334155',
+        confirmButtonText: 'Sí, desvincular',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if(result.isConfirmed) { 
         await deleteDoc(doc(db, "requests", id)); 
         await registrarBitacora("ELIMINAR PACIENTE", `El doctor eliminó la conexión con la solicitud ID: ${id}`);
+        
+        Swal.fire('Eliminado', 'El paciente ha sido desvinculado.', 'success');
         loadMyPatients(); 
     }
 };
 
 // 5. ASIGNAR EJERCICIO (CON SEGURIDAD)
+// 5. ASIGNAR EJERCICIO (CON SEGURIDAD Y SWEETALERT)
 document.getElementById('assignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // --- VALIDACIÓN DE SEGURIDAD ---
-    if (!selectedPatientId) return alert("⚠️ Selecciona un paciente primero.");
+    if (!selectedPatientId) return Swal.fire('Atención', 'Selecciona un paciente primero en la lista izquierda.', 'warning');
+    
     const reps = document.getElementById('repsMeta').value;
-    if (reps < 1) return alert("⚠️ La meta debe ser mayor a 0.");
-    if (reps > 100 && !confirm("⚠️ ¿Seguro que quieres mandar más de 100 repeticiones?")) return;
-    // -------------------------------
+    if (reps < 1) return Swal.fire('Error', 'La meta debe ser mayor a 0.', 'error');
+    
+    if (reps > 100) {
+        const confirmReps = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: `¿Quieres mandar ${reps} repeticiones? Es una cantidad muy alta.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'Sí, enviar de todos modos'
+        });
+        if(!confirmReps.isConfirmed) return;
+    }
 
     const ex = document.getElementById('exerciseSelect').value;
     const btn = document.getElementById('btnAssign');
     
     btn.disabled = true; btn.innerText = "Enviando...";
-    await addDoc(collection(db, "assignments"), {
-        id_doctor: auth.currentUser.uid,
-        id_paciente: selectedPatientId,
-        tipo_ejercicio: ex,
-        reps_meta: parseInt(reps),
-        estado: "pendiente",
-        fecha: new Date(),
-        reps_realizadas: 0
-    });
-
-    // --- ESTA ES LA LÍNEA NUEVA QUE FALTABA ---
-    await registrarBitacora("ASIGNAR RUTINA", `Se asignó el ejercicio ${ex} (${reps} reps) al paciente ID: ${selectedPatientId}`);
-    // ------------------------------------------
     
-    alert("✅ Rutina enviada");
+    try {
+        await addDoc(collection(db, "assignments"), {
+            id_doctor: auth.currentUser.uid,
+            id_paciente: selectedPatientId,
+            tipo_ejercicio: ex,
+            reps_meta: parseInt(reps),
+            estado: "pendiente",
+            fecha: new Date(),
+            reps_realizadas: 0
+        });
+
+        await registrarBitacora("ASIGNAR RUTINA", `Se asignó ${ex} (${reps} reps) al paciente ID: ${selectedPatientId}`);
+        
+        Swal.fire('¡Rutina Enviada!', 'El paciente ya puede ver su nueva tarea.', 'success');
+    } catch (error) {
+        Swal.fire('Error', 'Hubo un problema al asignar la rutina.', 'error');
+    }
+    
     btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Enviar Rutina';
 });
 

@@ -55,6 +55,8 @@ function actualizarAvatar(url) {
         };
         imgTemp.onerror = function() {
             restaurarAvatarDefault();
+            // Esta la dejamos con alert normal porque es un error de formato de imagen, 
+            // no de validación de base de datos.
             alert("❌ El enlace no es una imagen válida.\nIntenta copiar la dirección de la imagen (terminada en .jpg o .png).");
             photoIn.value = "";
         };
@@ -73,32 +75,43 @@ function restaurarAvatarDefault() {
 // Escuchar cambios en el input de foto
 photoIn.addEventListener('input', (e) => actualizarAvatar(e.target.value));
 
-// 3. GUARDAR CAMBIOS (CON VALIDACIONES)
+// 3. GUARDAR CAMBIOS (CON VALIDACIONES SWEETALERT Y TELÉFONO ESTRICTO)
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // --- VALIDACIONES DE SEGURIDAD ---
+    // --- VALIDACIONES CON SWEETALERT ---
     if (nombreIn.value.trim().length < 3) {
-        return alert("⚠️ El nombre es muy corto.");
+        return Swal.fire('Nombre Inválido', 'El nombre es muy corto. Usa tu nombre real.', 'error');
     }
 
-    const telLimpio = telefonoIn.value.replace(/\D/g,''); 
-    if (telLimpio.length < 10) {
-        return alert("⚠️ Ingresa un teléfono válido (ej: 584141234567).");
+    // --- VALIDACIÓN DE TELÉFONO ESTRICTA ---
+    const telefonoRaw = telefonoIn.value.trim();
+    if (telefonoRaw.length > 0) {
+        // 1. Prohibir letras y símbolos raros (solo permite números y el signo +)
+        if (/[^0-9+]/.test(telefonoRaw)) {
+            return Swal.fire('Teléfono Inválido', 'El teléfono no puede contener letras ni espacios.', 'error');
+        }
+        
+        // 2. Verificar que tenga suficientes números
+        const telLimpio = telefonoRaw.replace(/\D/g,''); 
+        if (telLimpio.length < 10) {
+            return Swal.fire('Teléfono Inválido', 'Ingresa un número válido con código de área (mínimo 10 dígitos).', 'error');
+        }
     }
 
+    // Validación de fecha
     if (fechaIn.value) {
         const fechaNac = new Date(fechaIn.value);
         const hoy = new Date();
         const edad = hoy.getFullYear() - fechaNac.getFullYear();
         
-        if (fechaNac > hoy) return alert("⚠️ No puedes haber nacido en el futuro.");
-        if (edad > 110 || edad < 5) return alert("⚠️ Verifica la fecha de nacimiento.");
+        if (fechaNac > hoy) return Swal.fire('Fecha Inválida', 'No puedes haber nacido en el futuro 🤖', 'error');
+        if (edad > 110 || edad < 5) return Swal.fire('Fecha Inválida', 'Por favor verifica tu año de nacimiento.', 'error');
     }
     // ---------------------------------
 
     const btn = form.querySelector('button');
-    btn.disabled = true;
+    btn.disabled = true; 
     btn.innerText = "Guardando...";
 
     try {
@@ -106,15 +119,14 @@ form.addEventListener('submit', async (e) => {
         await updateDoc(doc(db, "users", user.uid), {
             nombre: nombreIn.value,
             cedula: cedulaIn.value,
-            telefono: telefonoIn.value,
+            telefono: telefonoRaw, // Guardamos el teléfono crudo validado
             fechaNacimiento: fechaIn.value,
             genero: generoIn.value,
             photoUrl: photoIn.value
         });
-        alert("✅ Perfil actualizado correctamente");
+        Swal.fire('¡Perfil Actualizado!', 'Tus datos se guardaron correctamente.', 'success');
     } catch (error) {
-        console.error(error);
-        alert("Error: " + error.message);
+        Swal.fire('Error al guardar', error.message, 'error');
     }
 
     btn.disabled = false;

@@ -39,7 +39,7 @@
                     </div>
                     <div>
                         <label style="font-size: 0.8rem; color: var(--text-muted);">Teléfono (con código país)</label>
-                        <input type="tel" id="telefono" placeholder="Ej: 584141234567">
+                       <input type="tel" id="telefono" placeholder="Ej: +584141234567" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
                     </div>
                 </div>
 

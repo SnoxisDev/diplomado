@@ -156,22 +156,29 @@ async function loadDoctors() {
     } catch (e) { console.error(e); }
 }
 
-// 4. Enviar Solicitud (CON ANTI-DUPLICADO)
+// 4. Enviar Solicitud (CON SWEETALERT)
 window.enviarSolicitud = async (doctorId, doctorName) => {
     const patientId = auth.currentUser.uid;
     const patientName = document.getElementById('userName').innerText;
 
-    if(!confirm(`¿Enviar solicitud al ${doctorName}?`)) return;
+    const result = await Swal.fire({
+        title: `¿Atenderte con el Dr. ${doctorName}?`,
+        text: "Le enviaremos una solicitud para que evalúe tu caso.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        confirmButtonText: 'Sí, enviar solicitud',
+        cancelButtonText: 'Cancelar'
+    });
 
-    // VERIFICACIÓN DOBLE: Verificar si ya existe solicitud antes de crearla
-    // (Aunque checkStatus ayuda, esto es seguridad extra)
+    if(!result.isConfirmed) return;
+
     const q = query(collection(db, "requests"), where("id_paciente", "==", patientId), where("id_doctor", "==", doctorId));
     const snap = await getDocs(q);
     
     if(!snap.empty) {
-        alert("⚠️ Ya tienes una solicitud pendiente o activa con este doctor.");
-        window.location.reload();
-        return;
+        return Swal.fire('Aviso', 'Ya tienes una solicitud pendiente o activa con este doctor.', 'warning')
+        .then(() => window.location.reload());
     }
 
     try {
@@ -181,18 +188,15 @@ window.enviarSolicitud = async (doctorId, doctorName) => {
             estado: "pendiente", fecha: new Date()
         });
 
-        // Guardar en bitácora
         await addDoc(collection(db, "bitacora"), {
-            fecha: new Date(),
-            usuario_id: patientId,
-            accion: "NUEVA SOLICITUD",
+            fecha: new Date(), usuario_id: patientId, accion: "NUEVA SOLICITUD",
             detalle: `El paciente ${patientName} solicitó atención al ${doctorName}`
         });
         
-        alert("Solicitud enviada exitosamente.");
-        window.location.reload(); // Recargar para que checkStatus actualice la vista
+        Swal.fire('¡Enviada!', 'El doctor ha sido notificado. Espera su aprobación.', 'success')
+        .then(() => window.location.reload());
     } catch (e) {
-        alert("Error: " + e.message);
+        Swal.fire('Error', e.message, 'error');
     }
 }
 
@@ -207,14 +211,23 @@ auth.onAuthStateChanged(user => {
 
 // Función para borrar la relación con el doctor
 window.dejarDoctor = async (reqId) => {
-    if(confirm("¿Seguro que quieres dejar a este doctor o cancelar la solicitud?")) {
+    const result = await Swal.fire({
+        title: '¿Cambiar de Especialista?',
+        text: "Se cancelará tu tratamiento actual con este doctor.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if(result.isConfirmed) {
         try {
             await deleteDoc(doc(db, "requests", reqId));
-            alert("Listo. Ahora puedes elegir un nuevo doctor.");
-            window.location.reload();
+            Swal.fire('Listo', 'Ahora puedes elegir un nuevo doctor del directorio.', 'success')
+            .then(() => window.location.reload());
         } catch (e) {
-            console.error(e);
-            alert("Error: " + e.message);
+            Swal.fire('Error', e.message, 'error');
         }
     }
 }

@@ -36,10 +36,11 @@ function calculateAngle(a, b, c) {
 }
 
 // 3. FINALIZAR
+// 3. FINALIZAR (CON EVALUACIÓN DE DOLOR)
 async function finishExercise() {
     isFinished = true;
     lblFeedback.innerText = "🎉 ¡COMPLETADO!";
-    lblFeedback.style.color = "#10b981"; // Verde éxito
+    lblFeedback.style.color = "#10b981"; 
     camera.stop();
 
     try {
@@ -51,19 +52,40 @@ async function finishExercise() {
                 reps_realizadas: count
             });
 
-            // Guardar en la bitácora que el paciente terminó
             const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            
+            // Bitácora
             await addDoc(collection(db, "bitacora"), {
                 fecha: new Date(),
-                usuario_id: "Paciente", // Como vision.js no importa auth fácilmente, lo dejamos genérico
+                usuario_id: "Paciente", 
                 accion: "EJERCICIO COMPLETADO",
-                detalle: `Un paciente completó ${count} repeticiones de ${EXERCISE_TYPE}`
+                detalle: `Completó ${count} repeticiones de ${EXERCISE_TYPE}`
+            });
+
+            // 🌟 NUEVO: PREGUNTA DE DOLOR CON SWEETALERT
+            const { value: nivelDolor } = await Swal.fire({
+                title: '¡Rutina Terminada!',
+                text: 'Del 1 al 10, ¿cuánto dolor sentiste en este ejercicio?',
+                icon: 'question',
+                input: 'range',
+                inputAttributes: { min: 1, max: 10, step: 1 },
+                inputValue: 1,
+                confirmButtonColor: '#3b82f6',
+                confirmButtonText: 'Guardar Resultado'
+            });
+
+            // Guardar el dolor en la nueva colección
+            await addDoc(collection(db, "evaluaciones_dolor"), {
+                id_asignacion: ASSIGNMENT_ID,
+                tipo_ejercicio: EXERCISE_TYPE,
+                nivel_dolor: parseInt(nivelDolor || 1),
+                fecha: new Date()
             });
             
-            setTimeout(() => {
-                alert("✅ Ejercicio guardado. Volviendo al menú.");
+            Swal.fire('¡Guardado!', 'Tu doctor evaluará tu progreso.', 'success').then(() => {
                 window.location.href = "dashboard-paciente.html";
-            }, 1000);
+            });
+
         } else {
             alert("Modo prueba terminado.");
             window.history.back();
