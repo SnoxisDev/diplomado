@@ -339,7 +339,26 @@ window.enviarWhatsApp = (telefono, nombre, ejercicio, reps) => {
 
 // Auth
 if(logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth).then(()=>window.location.href='index.html'));
-auth.onAuthStateChanged(user => {
-    if(user) { loadIncomingRequests(); loadMyPatients(); }
-    else window.location.href='index.html';
+// 7. INICIALIZACIÓN Y SEGURIDAD DE RUTAS
+if(logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth).then(()=>window.location.href='index.html'));
+
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        // 🔒 BLINDAJE: Verificamos en la base de datos que sea Doctor
+        if (user.email === "admin@gmail.com") {
+            window.location.href = 'dashboard-admin.html'; // Redirige al admin a su panel
+            return;
+        }
+
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (docSnap.exists() && docSnap.data().rol === "doctor") {
+            loadIncomingRequests(); 
+            loadMyPatients();
+        } else {
+            // Si es paciente, lo devolvemos a su panel
+            window.location.href = 'dashboard-paciente.html';
+        }
+    } else {
+        window.location.href = 'index.html';
+    }
 });

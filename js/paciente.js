@@ -204,10 +204,25 @@ window.enviarSolicitud = async (doctorId, doctorName) => {
 // Cerrar sesión
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
 
-// Init
-auth.onAuthStateChanged(user => {
-    if (user) checkStatus(user);
-    else window.location.href = 'index.html';
+// Init y Seguridad de Rutas
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        // 🔒 BLINDAJE: Verificamos en la base de datos que sea Paciente
+        if (user.email === "admin@gmail.com") {
+            window.location.href = 'dashboard-admin.html';
+            return;
+        }
+
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (docSnap.exists() && docSnap.data().rol === "paciente") {
+            checkStatus(user);
+        } else {
+            // Si es doctor, lo devolvemos a su clínica
+            window.location.href = 'dashboard-dr.html';
+        }
+    } else {
+        window.location.href = 'index.html';
+    }
 });
 
 // Función para borrar la relación con el doctor

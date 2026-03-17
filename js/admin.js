@@ -323,8 +323,24 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     signOut(auth).then(() => window.location.href = 'index.html');
 });
 
+// ==========================================
+// 5. INICIALIZACIÓN Y SEGURIDAD DE RUTAS
+// ==========================================
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    signOut(auth).then(() => window.location.href = 'index.html');
+});
+
 auth.onAuthStateChanged(user => {
     if (user) {
+        // 🔒 BLINDAJE: Solo el administrador maestro puede ver esta vista
+        if (user.email !== "admin@gmail.com") {
+            Swal.fire('Acceso Denegado', 'No tienes permisos de Administrador.', 'error')
+            .then(() => {
+                window.location.href = 'index.html'; // Lo expulsa
+            });
+            return;
+        }
+        
         cargarUsuarios();
         cargarEstadisticas();
         cargarBitacoraConFiltro();
