@@ -86,6 +86,14 @@ authForm.addEventListener('submit', async (e) => {
             const docSnap = await getDoc(doc(db, "users", user.uid));
             
             if (docSnap.exists()) {
+                // 🔒 NUEVO: VERIFICACIÓN DE BLOQUEO
+                if (docSnap.data().estado === 'bloqueado') {
+                    // Importar y ejecutar el cierre de sesión inmediatamente
+                    const { signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+                    await signOut(auth);
+                    throw new Error("Tu cuenta ha sido bloqueada por el Administrador. Contacta a soporte.");
+                }
+
                 redirigir(docSnap.data().rol);
             } else {
                 throw new Error("Usuario sin datos en la base de datos.");

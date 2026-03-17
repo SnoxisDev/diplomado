@@ -1,9 +1,12 @@
 import { auth, db } from './firebase-config.js';
-import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ==========================================
 // 1. CARGAR TODOS LOS USUARIOS (READ & UPDATE)
+// ==========================================
+// ==========================================
+// 1. CARGAR TODOS LOS USUARIOS (READ, UPDATE, BLOCK)
 // ==========================================
 async function cargarUsuarios() {
     try {
@@ -20,17 +23,35 @@ async function cargarUsuarios() {
 
         snapshot.forEach(docSnap => {
             const user = docSnap.data();
+            
+            // Badge de Rol
             let rolBadge = user.rol === 'doctor' 
                 ? '<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;">Doctor</span>'
                 : '<span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;">Paciente</span>';
+            
+            // 🔒 NUEVO: Badge de Estado (Bloqueado o Activo)
+            let estadoActual = user.estado || "activo"; // Por defecto todos son activos
+            let estadoBadge = estadoActual === 'bloqueado'
+                ? '<span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px;"><i class="fa-solid fa-lock"></i> Bloqueado</span>'
+                : '';
+
+            // 🔒 NUEVO: Botón de Bloqueo (Cambia de icono dependiendo del estado)
+            let iconBloqueo = estadoActual === 'bloqueado' ? '<i class="fa-solid fa-unlock"></i>' : '<i class="fa-solid fa-ban"></i>';
+            let colorBloqueo = estadoActual === 'bloqueado' ? '#10b981' : '#64748b';
 
             usersTable.innerHTML += `
                 <tr>
-                    <td><strong>${user.nombre}</strong><br><small style="color:gray;">${docSnap.id}</small></td>
+                    <td><strong>${user.nombre}</strong> ${estadoBadge}<br><small style="color:gray;">${user.email}</small></td>
                     <td>${rolBadge}</td>
                     <td>
                         <button onclick="cambiarRol('${docSnap.id}', '${user.nombre}', '${user.rol}')" class="btn" style="background: var(--warning); color: #000; padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" title="Cambiar Rol">
                             <i class="fa-solid fa-user-pen"></i>
+                        </button>
+                        <button onclick="cambiarPassword('${user.email}', '${user.nombre}')" class="btn" style="background: #3b82f6; color: white; padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" title="Restablecer Contraseña">
+                            <i class="fa-solid fa-key"></i>
+                        </button>
+                        <button onclick="toggleBloqueo('${docSnap.id}', '${user.nombre}', '${estadoActual}')" class="btn" style="background: ${colorBloqueo}; color: white; padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" title="Bloquear / Desbloquear">
+                            ${iconBloqueo}
                         </button>
                         <button onclick="eliminarUsuario('${docSnap.id}', '${user.nombre}')" class="btn" style="background: #ef4444; color: white; padding: 5px 10px; font-size: 0.8rem;" title="Eliminar">
                             <i class="fa-solid fa-trash"></i>
@@ -44,17 +65,74 @@ async function cargarUsuarios() {
     }
 }
 
+// NUEVO: Función para Bloquear/Desbloquear
+window.toggleBloqueo = async (userId, nombre, estadoActual) => {
+    let nuevoEstado = estadoActual === 'bloqueado' ? 'activo' : 'bloqueado';
+    let accionTexto = estadoActual === 'bloqueado' ? 'desbloquear' : 'bloquear';
+
+    const result = await Swal.fire({
+        title: `¿${accionTexto.toUpperCase()} a ${nombre}?`,
+        text: estadoActual === 'bloqueado' ? "El usuario podrá volver a iniciar sesión." : "El usuario no podrá entrar al sistema.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: estadoActual === 'bloqueado' ? '#10b981' : '#ef4444',
+        confirmButtonText: `Sí, ${accionTexto}`,
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await updateDoc(doc(db, "users", userId), { estado: nuevoEstado });
+            await addDoc(collection(db, "bitacora"), {
+                fecha: new Date(),
+                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
+                accion: nuevoEstado === 'bloqueado' ? "USUARIO BLOQUEADO" : "USUARIO DESBLOQUEADO",
+                detalle: `El Administrador cambió el estado de ${nombre} a ${nuevoEstado}`
+            });
+            Swal.fire('¡Listo!', `El usuario ha sido ${nuevoEstado}.`, 'success');
+            cargarUsuarios(); cargarBitacoraConFiltro();
+        } catch (error) {
+            Swal.fire('Error', error.message, 'error');
+        }
+    }
+};
+
+// NUEVO: Función para Cambiar Contraseña
+window.cambiarPassword = async (email, nombre) => {
+    const result = await Swal.fire({
+        title: '¿Enviar enlace de contraseña?',
+        text: `Se enviará un correo a ${email} para que ${nombre} cree una nueva clave.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            await addDoc(collection(db, "bitacora"), {
+                fecha: new Date(),
+                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
+                accion: "RESETEO DE CONTRASEÑA",
+                detalle: `Se envió un enlace de recuperación al correo ${email}`
+            });
+            Swal.fire('¡Enviado!', 'Revisa la bandeja de entrada del correo.', 'success');
+            cargarBitacoraConFiltro();
+        } catch (error) {
+            Swal.fire('Error', error.message, 'error');
+        }
+    }
+};
+
 window.cambiarRol = async (userId, nombre, rolActual) => {
-    // ALERTA SWEETALERT: Selector de Rol Moderno
     const { value: nuevoRol } = await Swal.fire({
         title: `Cambiar rol de ${nombre}`,
         text: `Rol actual: ${rolActual.toUpperCase()}`,
         icon: 'question',
         input: 'select',
-        inputOptions: {
-            'doctor': '👨‍⚕️ Doctor',
-            'paciente': '🤕 Paciente'
-        },
+        inputOptions: { 'doctor': '👨‍⚕️ Doctor', 'paciente': '🤕 Paciente' },
         inputValue: rolActual,
         showCancelButton: true,
         confirmButtonText: 'Actualizar Rol',
@@ -66,56 +144,35 @@ window.cambiarRol = async (userId, nombre, rolActual) => {
         try {
             await updateDoc(doc(db, "users", userId), { rol: nuevoRol });
             await addDoc(collection(db, "bitacora"), {
-                fecha: new Date(),
-                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
-                accion: "CAMBIO DE ROL",
-                detalle: `El Administrador cambió el rol de ${nombre} a ${nuevoRol}`
+                fecha: new Date(), usuario_id: auth.currentUser.uid,
+                accion: "CAMBIO DE ROL", detalle: `Se cambió el rol de ${nombre} a ${nuevoRol}`
             });
-            
-            // ALERTA SWEETALERT: Éxito
             Swal.fire('¡Actualizado!', 'El rol ha sido cambiado exitosamente.', 'success');
-            
-            cargarUsuarios(); 
-            cargarEstadisticas(); 
-            cargarBitacoraConFiltro();
-        } catch (error) {
-            Swal.fire('Error', error.message, 'error');
-        }
+            cargarUsuarios(); cargarEstadisticas(); cargarBitacoraConFiltro();
+        } catch (error) { Swal.fire('Error', error.message, 'error'); }
     }
 };
 
 window.eliminarUsuario = async (userId, nombre) => {
-    // ALERTA SWEETALERT: Confirmación Peligrosa
     const result = await Swal.fire({
         title: `¿Eliminar a ${nombre}?`,
         text: "Esta acción borrará al usuario de la base de datos para siempre.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#334155',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+        confirmButtonText: 'Sí, eliminar'
     });
 
     if (result.isConfirmed) {
         try {
             await deleteDoc(doc(db, "users", userId));
             await addDoc(collection(db, "bitacora"), {
-                fecha: new Date(),
-                usuario_id: auth.currentUser ? auth.currentUser.uid : "Admin",
-                accion: "USUARIO ELIMINADO",
-                detalle: `El Administrador eliminó del sistema al usuario: ${nombre}`
+                fecha: new Date(), usuario_id: auth.currentUser.uid,
+                accion: "USUARIO ELIMINADO", detalle: `El Admin eliminó a: ${nombre}`
             });
-            
-            // ALERTA SWEETALERT: Eliminado
             Swal.fire('¡Eliminado!', 'El usuario ha sido borrado.', 'success');
-            
-            cargarUsuarios(); 
-            cargarEstadisticas();
-            cargarBitacoraConFiltro();
-        } catch (error) {
-            Swal.fire('Error', error.message, 'error');
-        }
+            cargarUsuarios(); cargarEstadisticas(); cargarBitacoraConFiltro();
+        } catch (error) { Swal.fire('Error', error.message, 'error'); }
     }
 };
 
