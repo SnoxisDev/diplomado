@@ -3,9 +3,6 @@ import { signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebas
 import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ==========================================
-// 1. CARGAR TODOS LOS USUARIOS (READ & UPDATE)
-// ==========================================
-// ==========================================
 // 1. CARGAR TODOS LOS USUARIOS (READ, UPDATE, BLOCK)
 // ==========================================
 async function cargarUsuarios() {
@@ -176,32 +173,101 @@ window.eliminarUsuario = async (userId, nombre) => {
     }
 };
 
+/// ==========================================
+// 2. ESTADÍSTICAS GLOBALES Y GRÁFICAS
 // ==========================================
-// 2. ESTADÍSTICAS GLOBALES
-// ==========================================
+let usersChartInstance = null;
+let routinesChartInstance = null;
+
+const initAdminCharts = () => {
+    const ctxUsers = document.getElementById('usersChart');
+    const ctxRoutines = document.getElementById('routinesChart');
+    if(!ctxUsers || !ctxRoutines) return;
+
+    // Gráfica de Dona (Usuarios)
+    usersChartInstance = new Chart(ctxUsers, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pacientes', 'Doctores', 'Admins'],
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                borderColor: '#1e293b',
+                borderWidth: 2
+            }]
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } 
+        }
+    });
+
+    // Gráfica de Barras (Rutinas)
+    routinesChartInstance = new Chart(ctxRoutines, {
+        type: 'bar',
+        data: {
+            labels: ['Completadas', 'Pendientes'],
+            datasets: [{
+                label: 'Cantidad',
+                data: [0, 0],
+                backgroundColor: ['#10b981', '#f59e0b'],
+                borderRadius: 5
+            }]
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            }
+        }
+    });
+};
+
 const cargarEstadisticas = async () => {
     try {
         const usersSnap = await getDocs(collection(db, "users"));
-        let totalUsers = 0, totalPacientes = 0, totalDoctores = 0;
+        let totalPacientes = 0, totalDoctores = 0, totalAdmins = 0;
+        
         usersSnap.forEach(doc => {
-            totalUsers++;
             const data = doc.data();
             if(data.rol === "paciente") totalPacientes++;
-            if(data.rol === "doctor") totalDoctores++;
+            else if(data.rol === "doctor") totalDoctores++;
+            else totalAdmins++;
         });
 
-        const asignacionesSnap = await getDocs(query(collection(db, "assignments"), where("estado", "==", "completado")));
-        let totalRutinas = asignacionesSnap.size;
+        const asignacionesSnap = await getDocs(collection(db, "assignments"));
+        let totalCompletadas = 0, totalPendientes = 0;
+        
+        asignacionesSnap.forEach(doc => {
+            if(doc.data().estado === "completado") totalCompletadas++;
+            else totalPendientes++;
+        });
 
-        document.getElementById("stat-total-usuarios").innerText = totalUsers;
+        // Actualizar números en las tarjetas superiores
+        document.getElementById("stat-total-usuarios").innerText = usersSnap.size;
         document.getElementById("stat-pacientes").innerText = totalPacientes;
         document.getElementById("stat-doctores").innerText = totalDoctores;
-        document.getElementById("stat-rutinas").innerText = totalRutinas;
+        document.getElementById("stat-rutinas").innerText = totalCompletadas;
+
+        // Iniciar las gráficas si no existen
+        if(!usersChartInstance) initAdminCharts();
+
+        // Inyectar datos en las gráficas
+        if(usersChartInstance) {
+            usersChartInstance.data.datasets[0].data = [totalPacientes, totalDoctores, totalAdmins];
+            usersChartInstance.update();
+        }
+        if(routinesChartInstance) {
+            routinesChartInstance.data.datasets[0].data = [totalCompletadas, totalPendientes];
+            routinesChartInstance.update();
+        }
+
     } catch (error) {
         console.log("Error al cargar estadísticas: ", error);
     }
 };
-
 // ==========================================
 // 3. BITÁCORA INTELIGENTE (FILTROS)
 // ==========================================

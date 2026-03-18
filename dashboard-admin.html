@@ -161,6 +161,7 @@
     
 
     <div class="container">
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <p><i class="fa-solid fa-users"></i> Total Usuarios</p>
@@ -177,6 +178,21 @@
             <div class="stat-card" style="border-top-color: #28a745;">
                 <p><i class="fa-solid fa-check-double"></i> Rutinas Completadas</p>
                 <h2 id="stat-rutinas">0</h2>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            <div class="card" style="margin-bottom: 0;">
+                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.1rem;">Distribución de Usuarios</h3>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="usersChart"></canvas>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.1rem;">Estado de Rutinas</h3>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="routinesChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -270,8 +286,10 @@
 
         </div>
     </div>
+    </div>
 
     <script type="module" src="js/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
