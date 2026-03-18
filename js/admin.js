@@ -173,7 +173,7 @@ window.eliminarUsuario = async (userId, nombre) => {
     }
 };
 
-/// ==========================================
+// ==========================================
 // 2. ESTADÍSTICAS GLOBALES Y GRÁFICAS
 // ==========================================
 let usersChartInstance = null;
@@ -184,14 +184,14 @@ const initAdminCharts = () => {
     const ctxRoutines = document.getElementById('routinesChart');
     if(!ctxUsers || !ctxRoutines) return;
 
-    // Gráfica de Dona (Usuarios)
+    // Gráfica de Dona (Usuarios - SOLO PACIENTES Y DOCTORES)
     usersChartInstance = new Chart(ctxUsers, {
         type: 'doughnut',
         data: {
-            labels: ['Pacientes', 'Doctores', 'Admins'],
+            labels: ['Pacientes', 'Doctores'], // Quitado el Admin
             datasets: [{
-                data: [0, 0, 0],
-                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                data: [0, 0], // Ahora solo son 2 datos
+                backgroundColor: ['#3b82f6', '#10b981'], // Azul y Verde solamente
                 borderColor: '#1e293b',
                 borderWidth: 2
             }]
@@ -228,13 +228,12 @@ const initAdminCharts = () => {
 const cargarEstadisticas = async () => {
     try {
         const usersSnap = await getDocs(collection(db, "users"));
-        let totalPacientes = 0, totalDoctores = 0, totalAdmins = 0;
+        let totalPacientes = 0, totalDoctores = 0; // Eliminado el contador de admins
         
         usersSnap.forEach(doc => {
             const data = doc.data();
             if(data.rol === "paciente") totalPacientes++;
             else if(data.rol === "doctor") totalDoctores++;
-            else totalAdmins++;
         });
 
         const asignacionesSnap = await getDocs(collection(db, "assignments"));
@@ -245,7 +244,7 @@ const cargarEstadisticas = async () => {
             else totalPendientes++;
         });
 
-        // Actualizar números en las tarjetas superiores
+        // Actualizar números en las tarjetas superiores (Sigue contando todos los registros)
         document.getElementById("stat-total-usuarios").innerText = usersSnap.size;
         document.getElementById("stat-pacientes").innerText = totalPacientes;
         document.getElementById("stat-doctores").innerText = totalDoctores;
@@ -254,9 +253,9 @@ const cargarEstadisticas = async () => {
         // Iniciar las gráficas si no existen
         if(!usersChartInstance) initAdminCharts();
 
-        // Inyectar datos en las gráficas
+        // Inyectar datos en las gráficas (Solo pacientes y doctores)
         if(usersChartInstance) {
-            usersChartInstance.data.datasets[0].data = [totalPacientes, totalDoctores, totalAdmins];
+            usersChartInstance.data.datasets[0].data = [totalPacientes, totalDoctores]; 
             usersChartInstance.update();
         }
         if(routinesChartInstance) {
