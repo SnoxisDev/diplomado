@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const authForm = document.getElementById('authForm');
@@ -126,4 +126,44 @@ function redirigir(rol) {
     } else {
         window.location.href = 'dashboard-paciente.html';
     }
+}
+
+// ==========================================
+// NUEVO: RECUPERAR CONTRASEÑA
+// ==========================================
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const { value: emailToReset } = await Swal.fire({
+            title: 'Recuperar Contraseña',
+            text: 'Ingresa el correo con el que te registraste:',
+            icon: 'info',
+            input: 'email',
+            inputPlaceholder: 'usuario@ejemplo.com',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-envelope"></i> Enviar Enlace',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#3b82f6'
+        });
+
+        if (emailToReset) {
+            try {
+                await sendPasswordResetEmail(auth, emailToReset);
+                Swal.fire(
+                    '¡Correo Enviado!', 
+                    'Revisa tu bandeja de entrada (o la carpeta de SPAM) para crear una nueva contraseña.', 
+                    'success'
+                );
+            } catch (error) {
+                console.error("Error al enviar correo:", error);
+                let msg = 'No se pudo enviar el correo. Verifica que esté bien escrito.';
+                if (error.code === 'auth/user-not-found') msg = 'No hay ninguna cuenta registrada con este correo.';
+                
+                Swal.fire('Error', msg, 'error');
+            }
+        }
+    });
 }
