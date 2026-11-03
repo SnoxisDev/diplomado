@@ -3,218 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía de Ejercicios - TeleRehab</title>
+    <title>SIRA - Biblioteca y Guía Biomecánica</title>
+
+    <!-- Metadatos PWA para Móvil (Android & iOS) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIRA">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .guide-header { text-align: center; margin-bottom: 40px; padding: 20px; }
-        
-        .badge { display: inline-block; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; }
-        .badge-arm { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .badge-leg { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        
-        /* Efecto clic en las tarjetas principales */
-        .card-clickable { cursor: pointer; transition: 0.3s; }
-        .card-clickable:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); border-color: var(--primary); }
+        /* Estilos Ultra-Avanzados de la Biblioteca */
+        .biblio-hero {
+            text-align: center;
+            padding: 40px 20px 25px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-        /* =========================================
-           ESTILOS DE LA VENTANA EMERGENTE (MODAL)
-           ========================================= */
+        .biblio-search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 8px 20px;
+            max-width: 550px;
+            margin: 25px auto 20px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        .biblio-search-bar:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+        }
+        .biblio-search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            margin: 0;
+            width: 100%;
+        }
+        .biblio-search-bar input:focus {
+            box-shadow: none;
+        }
+
+        /* Filtros por Categoría */
+        .biblio-filter-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+        .filter-pill {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .filter-pill:hover, .filter-pill.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Tarjetas de Ejercicios Rediseñadas */
+        .biblio-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+        }
+        .biblio-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .biblio-card-thumb {
+            height: 180px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .thumb-blue { color: #3b82f6; }
+        .thumb-orange { color: #f59e0b; }
+        .thumb-green { color: #10b981; }
+        .thumb-purple { color: #8b5cf6; }
+
+        .thumb-status-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .badge-live-ai {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .badge-beta-guide {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .biblio-card-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .exercise-anatomy-pill {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .biblio-card-body h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.25rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .biblio-card-body p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin: 0 0 16px 0;
+        }
+
+        .biblio-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Estilos del Modal Mejorado */
         .modal-overlay {
-            display: none; /* Oculto por defecto */
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 7, 18, 0.88);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
             padding: 20px;
         }
 
         .modal-content {
-            background: var(--bg-main);
-            width: 100%; max-width: 500px; max-height: 90vh;
-            border-radius: 16px; border: 1px solid var(--primary);
-            overflow-y: auto; position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #0f172a;
+            width: 100%;
+            max-width: 620px;
+            max-height: 92vh;
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(59, 130, 246, 0.2);
         }
 
         .modal-header {
-            position: sticky; top: 0; background: var(--bg-card);
-            padding: 15px 20px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
+            position: sticky;
+            top: 0;
+            background: #1e293b;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             z-index: 10;
         }
 
         .btn-close {
-            background: transparent; border: none; color: var(--text-muted);
-            font-size: 1.5rem; cursor: pointer; transition: 0.2s;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .btn-close:hover { color: var(--danger); transform: scale(1.1); }
+        .btn-close:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
 
-        .modal-body { padding: 20px; }
+        .modal-body {
+            padding: 24px;
+        }
 
-        /* Paso a paso */
-        .step-box {
-            display: flex; gap: 15px; align-items: center;
-            background: var(--bg-card); padding: 15px;
-            border-radius: 12px; margin-bottom: 15px;
+        /* Sección de Errores Comunes */
+        .mistakes-box {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 15px;
+            font-size: 0.88rem;
+            color: #fca5a5;
+        }
+        .mistakes-box strong {
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+        }
+
+        /* Indicador de Ángulos Clínicos */
+        .angles-meter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 18px 0;
+        }
+        .angle-meter-card {
+            background: #1e293b;
             border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
         }
-        .step-number {
-            background: var(--primary); color: white;
-            width: 30px; height: 30px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; flex-shrink: 0;
+        .angle-meter-card span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
-        .step-img {
-            width: 80px; height: 80px; object-fit: cover;
-            border-radius: 8px; border: 1px solid var(--border);
-            background: #334155; /* Placeholder mientras pones las fotos reales */
-        }
-
-        /* Video tipo YouTube (Horizontal 16:9) */
-        .video-wrapper-yt {
-            width: 100%; max-width: 450px; margin: 20px auto 0 auto;
-            aspect-ratio: 16/9; /* Formato horizontal clásico de YouTube */
-            background: #000; border-radius: 12px; overflow: hidden;
-            border: 3px solid var(--primary);
-            position: relative;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-        .video-wrapper-yt iframe {
-            width: 100%; height: 100%; border: none;
-        }
-        
-        /* Tip de la IA */
-        .tip-box {
-            background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--warning);
-            padding: 10px; font-size: 0.9rem; color: #fbbf24; margin-top: 15px; border-radius: 0 8px 8px 0;
+        .angle-meter-card strong {
+            display: block;
+            font-size: 1.4rem;
+            color: #38bdf8;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="dashboard-paciente.html" class="btn" style="background: transparent; border: 1px solid var(--border); color: var(--text-main);">
-            <i class="fa-solid fa-arrow-left"></i> Volver
+    <!-- Barra de Navegación Profesional -->
+    <header class="biblio-nav">
+        <button onclick="volverAtras()" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i> <span id="lblVolver">Volver</span>
+        </button>
+
+        <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: white;">
+            <img src="img/logo-sira.png.png" alt="Logo SIRA" style="height: 42px; width: auto; filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));">
+            <span style="font-weight: 800; font-size: 1.3rem; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SIRA</span>
         </a>
-        <h1>📚 Biblioteca de Ejercicios</h1>
-    </div>
+
+        <div class="biblio-nav-actions">
+            <a href="index.html" class="btn" style="background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.88rem;">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="login.html" class="btn-primary" style="font-size: 0.88rem; padding: 8px 16px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+            </a>
+        </div>
+    </header>
 
     <div class="container">
-        <div class="guide-header">
-            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">
-                Selecciona un ejercicio para ver el paso a paso y el video demostrativo de nuestros especialistas.
+        
+        <!-- Hero de la Biblioteca -->
+        <div class="biblio-hero">
+            <span class="section-badge"><i class="fa-solid fa-book-medical"></i> Base de Conocimiento Clínico</span>
+            <h1 style="font-size: 2.4rem; font-weight: 800; margin: 12px 0; color: white;">
+                Catálogo Biomecánico y Tutoriales
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;">
+                Consulta la ejecución correcta, las fases articulares y los rangos angulares que el sistema inteligente SIRA mide a través de la cámara web.
             </p>
+
+            <!-- Buscador Dinámico de Ejercicios -->
+            <div class="biblio-search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                <input type="text" id="exerciseSearchInput" placeholder="Buscar ejercicio por nombre, músculo o articulación...">
+            </div>
+
+            <!-- Filtros Rápidos -->
+            <div class="biblio-filter-tags">
+                <button class="filter-pill active" onclick="filtrarCategoria('todas', this)">Todos</button>
+                <button class="filter-pill" onclick="filtrarCategoria('brazos', this)">Bíceps y Codo</button>
+                <button class="filter-pill" onclick="filtrarCategoria('hombro', this)">Hombro y Manguito</button>
+                <button class="filter-pill" onclick="filtrarCategoria('piernas', this)">Piernas y Cadera</button>
+            </div>
         </div>
 
-        <div class="grid-container">
+        <!-- Cuadrícula de Ejercicios -->
+        <div class="grid-container" id="exercisesGrid">
             
-            <div class="card card-clickable" onclick="abrirModal('modal-flexion_codo')" style="padding: 0; overflow: hidden; text-align: center;">
-                <div style="height: 150px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #3b82f6;">
+            <!-- EJERCICIO 1: FLEXIÓN DE CODO -->
+            <div class="biblio-card" data-cat="brazos" onclick="abrirModal('modal-flexion_codo')">
+                <div class="biblio-card-thumb thumb-blue">
+                    <span class="thumb-status-badge badge-live-ai">
+                        <i class="fa-solid fa-camera"></i> Activo en IA
+                    </span>
                     <i class="fa-solid fa-dumbbell"></i>
                 </div>
-                <div style="padding: 20px;">
-                    <span class="badge badge-arm">Tren Superior</span>
-                    <h3 style="margin-top: 5px; margin-bottom: 15px;">Flexión de Codo (Bíceps)</h3>
-                    <button class="btn-primary" style="width: 100%;"><i class="fa-solid fa-eye"></i> Ver Explicación</button>
+                <div class="biblio-card-body">
+                    <div>
+                        <span class="exercise-anatomy-pill">Articulación Húmero-Radial</span>
+                        <h3>Flexión de Codo (Bíceps)</h3>
+                        <p>Fortalecimiento del bíceps braquial y braquiorradial. Mide la amplitud de flexión concéntrica y extensión total para evitar hiperextensiones.</p>
+                    </div>
+                    <div class="biblio-card-footer">
+                        <span><i class="fa-solid fa-ruler-combined text-primary"></i> Rango: 45° a 160°</span>
+                        <span style="color: var(--primary); font-weight: 700;">Ver Guía <i class="fa-solid fa-angle-right"></i></span>
+                    </div>
                 </div>
             </div>
 
-           <div class="card card-clickable" onclick="abrirModal('modal-elevacion_lateral')" style="padding: 0; overflow: hidden; text-align: center;">
-                <div style="height: 150px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #f59e0b;">
+            <!-- EJERCICIO 2: ELEVACIÓN LATERAL -->
+            <div class="biblio-card" data-cat="hombro" onclick="abrirModal('modal-elevacion_lateral')">
+                <div class="biblio-card-thumb thumb-orange">
+                    <span class="thumb-status-badge badge-live-ai">
+                        <i class="fa-solid fa-camera"></i> Activo en IA
+                    </span>
                     <i class="fa-solid fa-person-arrow-up-from-line"></i>
                 </div>
-                <div style="padding: 20px;">
-                    <span class="badge badge-arm" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Hombro / Manguito</span>
-                    <h3 style="margin-top: 5px; margin-bottom: 15px;">Elevación Lateral</h3>
-                    <button class="btn-primary" style="width: 100%; background: var(--warning); color: black;"><i class="fa-solid fa-eye"></i> Ver Explicación</button>
+                <div class="biblio-card-body">
+                    <div>
+                        <span class="exercise-anatomy-pill" style="color: var(--warning);">Complejo Gleno-Humeral</span>
+                        <h3>Elevación Lateral (Hombro)</h3>
+                        <p>Abducción del brazo en el plano coronal para rehabilitación de deltoides medio y prevención del pinzamiento subacromial.</p>
+                    </div>
+                    <div class="biblio-card-footer">
+                        <span><i class="fa-solid fa-ruler-combined text-warning"></i> Rango: 25° a 90°</span>
+                        <span style="color: var(--warning); font-weight: 700;">Ver Guía <i class="fa-solid fa-angle-right"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 3: SENTADILLA TERAPÉUTICA -->
+            <div class="biblio-card" data-cat="piernas" onclick="abrirModal('modal-sentadilla')">
+                <div class="biblio-card-thumb thumb-green">
+                    <span class="thumb-status-badge badge-live-ai">
+                        <i class="fa-solid fa-camera"></i> Activo en IA
+                    </span>
+                    <i class="fa-solid fa-person-walking"></i>
+                </div>
+                <div class="biblio-card-body">
+                    <div>
+                        <span class="exercise-anatomy-pill" style="color: var(--success);">Tren Inferior / Cadera</span>
+                        <h3>Sentadilla Terapéutica</h3>
+                        <p>Flexo-extensión de rodilla y cadera para fortalecimiento de cuádriceps y glúteos sin sobrepasar los 90° de flexión patelar.</p>
+                    </div>
+                    <div class="biblio-card-footer">
+                        <span><i class="fa-solid fa-ruler-combined text-success"></i> Rango: 70° a 170°</span>
+                        <span style="color: var(--success); font-weight: 700;">Ver Guía <i class="fa-solid fa-angle-right"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 4: ELEVACIÓN FRONTAL -->
+            <div class="biblio-card" data-cat="hombro" onclick="abrirModal('modal-elevacion_frontal')">
+                <div class="biblio-card-thumb thumb-purple">
+                    <span class="thumb-status-badge badge-live-ai">
+                        <i class="fa-solid fa-camera"></i> Activo en IA
+                    </span>
+                    <i class="fa-solid fa-hand-holding-hand"></i>
+                </div>
+                <div class="biblio-card-body">
+                    <div>
+                        <span class="exercise-anatomy-pill" style="color: var(--accent-purple);">Deltoides Anterior</span>
+                        <h3>Elevación Frontal</h3>
+                        <p>Flexión de hombro hacia el frente hasta la horizontal para recuperar la movilidad del brazo tras inmovilizaciones prolongadas.</p>
+                    </div>
+                    <div class="biblio-card-footer">
+                        <span><i class="fa-solid fa-ruler-combined text-purple"></i> Rango: 15° a 85°</span>
+                        <span style="color: var(--accent-purple); font-weight: 700;">Ver Guía <i class="fa-solid fa-angle-right"></i></span>
+                    </div>
                 </div>
             </div>
 
         </div>
+
     </div>
 
+    <!-- =========================================
+         MODALES DE DETALLE CLÍNICO
+         ========================================= -->
+
+    <!-- MODAL 1: FLEXIÓN DE CODO -->
     <div id="modal-flexion_codo" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-flexion_codo')">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="margin: 0; color: var(--primary);">Flexión de Codo (Bíceps)</h3>
+                <div>
+                    <span style="font-size: 0.75rem; color: #60a5fa; font-weight: 700;">BRAZO / BÍCEPS</span>
+                    <h3 style="margin: 0; color: white;">Flexión de Codo</h3>
+                </div>
                 <button class="btn-close" onclick="cerrarModal('modal-flexion_codo')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 
-                <h4 style="margin-top: 0;">Fases del Movimiento:</h4>
-                
+                <h4 style="margin-top: 0; color: var(--text-main); font-size: 1.1rem;">
+                    <i class="fa-solid fa-route text-primary"></i> Fases del Movimiento
+                </h4>
+
                 <div class="step-box">
                     <div class="step-number" style="background: var(--primary);">1</div>
-                    <img src="img/biceps-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+1'">
+                    <img src="img/biceps-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=Fase+1'">
                     <div>
-                        <strong style="color: var(--text-main);">Fase Excéntrica (Abajo)</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Brazo completamente extendido hacia abajo. El ángulo del codo debe ser mayor a 160°.</p>
+                        <strong style="color: var(--text-main);">1. Fase Excéntrica (Extensión Total)</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">El brazo inicia estirado hacia abajo, codo pegado al torso. El ángulo debe superar los 160° para habilitar la repetición.</p>
                     </div>
                 </div>
 
                 <div class="step-box">
                     <div class="step-number" style="background: var(--primary);">2</div>
-                    <img src="img/biceps-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+2'">
+                    <img src="img/biceps-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=Fase+2'">
                     <div>
-                        <strong style="color: var(--text-main);">Fase Concéntrica (Arriba)</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Sube el antebrazo contrayendo el bíceps hasta que el ángulo sea menor a 45°.</p>
+                        <strong style="color: var(--text-main);">2. Fase Concéntrica (Contracción)</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Sube la mano hacia el hombro contrayendo el bíceps hasta que el ángulo sea menor a 45°. El sistema contabilizará la repetición.</p>
                     </div>
                 </div>
 
-                <div class="tip-box" style="border-left-color: var(--primary); background: rgba(59, 130, 246, 0.1); color: #60a5fa;">
-                    <i class="fa-solid fa-robot"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
-                    Asegúrate de ponerte de perfil (de lado) a la cámara para que el sistema pueda leer correctamente el ángulo de tu codo.
+                <div class="angles-meter-grid">
+                    <div class="angle-meter-card">
+                        <span>Extensión Inicial</span>
+                        <strong style="color: #3b82f6;">> 160°</strong>
+                    </div>
+                    <div class="angle-meter-card">
+                        <span>Flexión Máxima</span>
+                        <strong style="color: #10b981;">< 45°</strong>
+                    </div>
                 </div>
 
-                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video</h4>
+                <div class="tip-box" style="border-left-color: var(--primary); background: rgba(59, 130, 246, 0.1); color: #93c5fd;">
+                    <i class="fa-solid fa-robot"></i> <strong>Tip de la IA de MediaPipe:</strong><br>
+                    Colócate en vista lateral (de perfil) hacia tu cámara para que el algoritmo rastree con exactitud la línea hombro-codo-muñeca.
+                </div>
+
+                <div class="mistakes-box">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> Error común a evitar:</strong>
+                    Evita balancear el torso o separar el codo del costado del cuerpo. El movimiento debe ser estrictamente en el antebrazo.
+                </div>
+
+                <h4 style="margin-top: 25px; text-align: center; color: white;">
+                    <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video de Especialistas
+                </h4>
                 
                 <div class="video-wrapper-yt" style="border-color: var(--primary);">
                     <iframe src="https://www.youtube.com/embed/ykJmrZ5v0Oo?rel=0" title="Tutorial Bíceps" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+                <div class="promo-monitor-box">
+                    <p><i class="fa-solid fa-camera"></i> <strong>¿Quieres que la IA supervise este ejercicio en vivo?</strong></p>
+                    <a href="login.html" class="btn-primary" style="font-size: 0.88rem; padding: 10px 18px;">
+                        <i class="fa-solid fa-play"></i> Iniciar Sesión para Monitorear
+                    </a>
                 </div>
 
             </div>
         </div>
     </div>
 
+    <!-- MODAL 2: ELEVACIÓN LATERAL -->
     <div id="modal-elevacion_lateral" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-elevacion_lateral')">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="margin: 0; color: var(--warning);">Elevación Lateral</h3>
+                <div>
+                    <span style="font-size: 0.75rem; color: #fbbf24; font-weight: 700;">HOMBRO / DELTOIDES</span>
+                    <h3 style="margin: 0; color: white;">Elevación Lateral</h3>
+                </div>
                 <button class="btn-close" onclick="cerrarModal('modal-elevacion_lateral')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 
-                <h4 style="margin-top: 0;">Fases del Movimiento:</h4>
-                
+                <h4 style="margin-top: 0; color: var(--text-main); font-size: 1.1rem;">
+                    <i class="fa-solid fa-route text-warning"></i> Fases del Movimiento
+                </h4>
+
                 <div class="step-box">
                     <div class="step-number" style="background: var(--warning); color: black;">1</div>
-                    <img src="img/hombro-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+1'">
+                    <img src="img/hombro-abajo.gif" alt="Fase 1" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=Fase+1'">
                     <div>
-                        <strong style="color: var(--text-main);">Posición Inicial</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Ponte de frente a la cámara. Deja los brazos colgando rectos a los lados de tu cuerpo.</p>
+                        <strong style="color: var(--text-main);">1. Posición Inicial (Aducción)</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Ponte de frente a la cámara con los brazos relajados a los lados. El ángulo en la axila debe ser menor a 25°.</p>
                     </div>
                 </div>
 
                 <div class="step-box">
                     <div class="step-number" style="background: var(--warning); color: black;">2</div>
-                    <img src="img/hombro-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=GIF+2'">
+                    <img src="img/hombro-arriba.gif" alt="Fase 2" class="step-img" onerror="this.src='https://placehold.co/80x80/1e293b/FFF?text=Fase+2'">
                     <div>
-                        <strong style="color: var(--text-main);">El Ascenso</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Levanta los brazos estirados hacia los lados hasta llegar casi a la altura de tus hombros (90°).</p>
+                        <strong style="color: var(--text-main);">2. Abducción (Elevación a la Horizontal)</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Sube los brazos hacia los laterales hasta alcanzar entre 75° y 90° (nivel del hombro). Mantén un segundo y desciende con control.</p>
+                    </div>
+                </div>
+
+                <div class="angles-meter-grid">
+                    <div class="angle-meter-card">
+                        <span>Apertura Mínima</span>
+                        <strong style="color: #f59e0b;">< 25°</strong>
+                    </div>
+                    <div class="angle-meter-card">
+                        <span>Elevación Meta</span>
+                        <strong style="color: #10b981;">75° - 90°</strong>
                     </div>
                 </div>
 
                 <div class="tip-box">
-                    <i class="fa-solid fa-robot"></i> <strong>Tip de la Inteligencia Artificial:</strong><br>
-                    El sistema medirá el ángulo desde tu cadera. Debes subir el brazo hasta llegar a los 75° o 90° para que cuente como válido.
+                    <i class="fa-solid fa-robot"></i> <strong>Tip de la IA de MediaPipe:</strong><br>
+                    Aléjate de 1.5 a 2 metros de la cámara para que el encuadre capte tu cadera y hombros completamente.
                 </div>
 
-                <h4 style="margin-top: 25px; text-align: center;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video</h4>
+                <div class="mistakes-box">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> Error común a evitar:</strong>
+                    No subas los brazos por encima de la línea de los hombros ni encojas el cuello para no sobrecargar el trapecio.
+                </div>
+
+                <h4 style="margin-top: 25px; text-align: center; color: white;">
+                    <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Tutorial en Video
+                </h4>
                 
                 <div class="video-wrapper-yt" style="border-color: var(--warning);">
                     <iframe src="https://www.youtube.com/embed/WJm9OqOGpsm?rel=0" title="Tutorial Elevación Lateral" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+                <div class="promo-monitor-box">
+                    <p><i class="fa-solid fa-camera"></i> <strong>¿Tienes esta rutina prescrita por tu fisioterapeuta?</strong></p>
+                    <a href="login.html" class="btn-primary" style="font-size: 0.88rem; padding: 10px 18px;">
+                        <i class="fa-solid fa-play"></i> Iniciar Sesión para Monitorear
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SENTADILLA TERAPÉUTICA -->
+    <div id="modal-sentadilla" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-sentadilla')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span style="font-size: 0.75rem; color: #34d399; font-weight: 700;">TREN INFERIOR</span>
+                    <h3 style="margin: 0; color: white;">Sentadilla Terapéutica</h3>
+                </div>
+                <button class="btn-close" onclick="cerrarModal('modal-sentadilla')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                
+                <h4 style="margin-top: 0; color: var(--text-main); font-size: 1.1rem;">
+                    <i class="fa-solid fa-route text-success"></i> Técnica Segura
+                </h4>
+
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--success); color: white;">1</div>
+                    <img src="https://placehold.co/80x80/1e293b/FFF?text=Sentadilla+1" alt="Fase 1" class="step-img">
+                    <div>
+                        <strong style="color: var(--text-main);">1. Posición Inicial</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Pies al ancho de los hombros, espalda neutra, vista al frente. Piernas extendidas (170° - 180°).</p>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--success); color: white;">2</div>
+                    <img src="https://placehold.co/80x80/1e293b/FFF?text=Sentadilla+2" alt="Fase 2" class="step-img">
+                    <div>
+                        <strong style="color: var(--text-main);">2. Descenso Controlado</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Flexiona cadera y rodillas empujando los glúteos hacia atrás hasta formar 90° o el límite indicado por tu terapeuta.</p>
+                    </div>
+                </div>
+
+                <div class="angles-meter-grid">
+                    <div class="angle-meter-card">
+                        <span>Extensión De Pie</span>
+                        <strong style="color: #10b981;">170°</strong>
+                    </div>
+                    <div class="angle-meter-card">
+                        <span>Flexión Rodilla</span>
+                        <strong style="color: #60a5fa;">85° - 90°</strong>
+                    </div>
+                </div>
+
+                <div class="mistakes-box">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> Precaución clínica:</strong>
+                    Nunca permitas que las rodillas colapsen hacia adentro (valgo de rodilla) ni despegues los talones del suelo.
+                </div>
+
+                <div class="promo-monitor-box">
+                    <p><i class="fa-solid fa-camera"></i> <strong>¿Deseas probar la sentadilla con detección de MediaPipe?</strong></p>
+                    <a href="monitor.html?tipo=sentadilla&meta=5" class="btn-primary" style="font-size: 0.88rem; padding: 10px 18px;">
+                        <i class="fa-solid fa-play"></i> Probar Sentadilla con IA
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ELEVACIÓN FRONTAL -->
+    <div id="modal-elevacion_frontal" class="modal-overlay" onclick="cerrarModalFuera(event, 'modal-elevacion_frontal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span style="font-size: 0.75rem; color: #c084fc; font-weight: 700;">HOMBRO ANTERIOR</span>
+                    <h3 style="margin: 0; color: white;">Elevación Frontal</h3>
+                </div>
+                <button class="btn-close" onclick="cerrarModal('modal-elevacion_frontal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                
+                <h4 style="margin-top: 0; color: var(--text-main); font-size: 1.1rem;">
+                    <i class="fa-solid fa-route" style="color: var(--accent-purple);"></i> Ejecución
+                </h4>
+
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--accent-purple); color: white;">1</div>
+                    <img src="https://placehold.co/80x80/1e293b/FFF?text=Frontal+1" alt="Fase 1" class="step-img">
+                    <div>
+                        <strong style="color: var(--text-main);">1. Inicio</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Brazos apoyados suavemente sobre los muslos, palmas hacia el cuerpo.</p>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-number" style="background: var(--accent-purple); color: white;">2</div>
+                    <img src="https://placehold.co/80x80/1e293b/FFF?text=Frontal+2" alt="Fase 2" class="step-img">
+                    <div>
+                        <strong style="color: var(--text-main);">2. Elevación en Sagital</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Eleva los brazos hacia adelante rectos hasta que queden paralelos al suelo (80° - 85°).</p>
+                    </div>
+                </div>
+
+                <div class="angles-meter-grid">
+                    <div class="angle-meter-card">
+                        <span>Posición Base</span>
+                        <strong style="color: #c084fc;">15°</strong>
+                    </div>
+                    <div class="angle-meter-card">
+                        <span>Elevación Sagital</span>
+                        <strong style="color: #38bdf8;">85°</strong>
+                    </div>
+                </div>
+
+                <div class="mistakes-box">
+                    <strong><i class="fa-solid fa-triangle-exclamation"></i> Error a evitar:</strong>
+                    No utilices inercia lumbar echando el torso hacia atrás para impulsar el brazo.
+                </div>
+
+                <div class="promo-monitor-box">
+                    <p><i class="fa-solid fa-camera"></i> <strong>¿Deseas probar la elevación frontal con detección de MediaPipe?</strong></p>
+                    <a href="monitor.html?tipo=elevacion_frontal&meta=5" class="btn-primary" style="font-size: 0.88rem; padding: 10px 18px;">
+                        <i class="fa-solid fa-play"></i> Probar Elevación Frontal con IA
+                    </a>
                 </div>
 
             </div>
@@ -222,41 +701,82 @@
     </div>
 
     <script>
-        // Función para abrir la ventana
+        // Función inteligente para volver
+        function volverAtras() {
+            if (document.referrer && (document.referrer.includes('dashboard-paciente') || document.referrer.includes('dashboard-dr'))) {
+                window.location.href = document.referrer;
+            } else if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Abrir y cerrar modal
         function abrirModal(idModal) {
             const modal = document.getElementById(idModal);
             if(modal) {
                 modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Evita que la página del fondo se mueva
+                document.body.style.overflow = 'hidden';
             }
         }
 
-        // Función para cerrar en la X
         function cerrarModal(idModal) {
-            document.getElementById(idModal).style.display = 'none';
-            document.body.style.overflow = 'auto'; // Vuelve a permitir scroll
+            const modal = document.getElementById(idModal);
+            if(modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
         }
 
-        // Función para cerrar si hace clic en el fondo oscuro
         function cerrarModalFuera(evento, idModal) {
             if (evento.target.id === idModal) {
                 cerrarModal(idModal);
             }
         }
 
-        // INTELIGENCIA DE NAVEGACIÓN (Si viene del dashboard)
+        // Buscador interactivo en tiempo real
+        const searchInput = document.getElementById('exerciseSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.biblio-card');
+
+                cards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    card.style.display = text.includes(term) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        // Filtro por categorías
+        function filtrarCategoria(cat, btn) {
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.biblio-card');
+            cards.forEach(card => {
+                if (cat === 'todas') {
+                    card.style.display = 'flex';
+                } else {
+                    const cardCat = card.getAttribute('data-cat');
+                    card.style.display = (cardCat === cat) ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // Inteligencia de URL (?ver=...)
         document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
             const ejercicioBuscado = params.get('ver');
 
             if (ejercicioBuscado) {
-                // Si la URL dice ?ver=sentadilla, abrimos el modal de sentadilla automáticamente
                 abrirModal('modal-' + ejercicioBuscado);
-                
-                // Limpiamos la URL sin recargar la página para que quede elegante
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/pwa-install.js" defer></script>
 </body>
 </html>

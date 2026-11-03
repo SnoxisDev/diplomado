@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <div class="header">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
         <button id="btnBack" class="btn" style="background: transparent; border: 1px solid var(--border); color: var(--text-main);">
             <i class="fa-solid fa-arrow-left"></i> Volver
         </button>
@@ -32,7 +32,7 @@
                 <label style="font-size: 0.8rem; color: var(--text-muted);">Nombre Completo</label>
                 <input type="text" id="nombre" required>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-grid-2cols">
                     <div>
                         <label style="font-size: 0.8rem; color: var(--text-muted);">Cédula / DNI</label>
                         <input type="number" id="cedula" placeholder="Ej: 12345678">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-grid-2cols">
                     <div>
                         <label style="font-size: 0.8rem; color: var(--text-muted);">Fecha Nacimiento</label>
                         <input type="date" id="fechaNacimiento">

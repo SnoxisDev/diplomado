@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRA - Acceso al Sistema</title>
+    
+    <!-- Metadatos PWA para Móvil (Android & iOS) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIRA">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ajuste de logo para evitar solapamientos */
+        .auth-logo-clean {
+            height: 65px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 12px auto;
+            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+            transition: transform 0.3s ease;
+        }
+        .auth-logo-clean:hover {
+            transform: scale(1.05);
+        }
+        .file-warning-banner {
+            display: none;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid #f59e0b;
+            color: #fde68a;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            text-align: left;
+        }
+        .file-warning-banner strong {
+            color: #fbbf24;
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+    <!-- Enlace superior para volver al inicio -->
+    <div class="auth-top-nav">
+        <a href="index.html" class="btn-back-home">
+            <i class="fa-solid fa-arrow-left"></i> Volver a la página principal
+        </a>
+    </div>
+
+    <div class="login-container" style="padding: 20px 15px;">
+        <!-- Tarjeta de autenticación -->
+        <div class="login-box modern-auth-box">
+            
+            <!-- Aviso si se abre con file:// en vez de servidor local -->
+            <div id="fileProtocolNotice" class="file-warning-banner">
+                <strong><i class="fa-solid fa-triangle-exclamation"></i> Aviso de Entorno Local:</strong>
+                Has abierto este archivo directamente con <code>file:///</code>. Los navegadores bloquean las peticiones a Firebase bajo este protocolo. Para que la base de datos y el registro funcionen, ábrelo con un servidor local (ej. extensión <strong>Live Server</strong> en VS Code).
+            </div>
+
+            <div class="auth-brand-header">
+                <a href="index.html" style="display: inline-block;">
+                    <img src="img/logo-sira.png.png" alt="Logo SIRA" class="auth-logo-clean">
+                </a>
+                <div>
+                    <span class="auth-brand-badge">
+                        <i class="fa-solid fa-shield-heart"></i> TeleRehab AI
+                    </span>
+                </div>
+                <h1 class="auth-title" id="authMainTitle">Bienvenido a SIRA</h1>
+                <p class="auth-subtitle" id="authMainSubtitle">Sistema Inteligente De Rehabilitación Asistida</p>
+            </div>
+
+            <!-- Selector de modo (Iniciar Sesión / Registro) -->
+            <div class="auth-tabs">
+                <button type="button" id="tabLogin" class="auth-tab active" onclick="cambiarModoAuth(false)">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+                <button type="button" id="tabRegister" class="auth-tab" onclick="cambiarModoAuth(true)">
+                    <i class="fa-solid fa-user-plus"></i> Registrarme
+                </button>
+            </div>
+
+            <form id="authForm" class="auth-form-styled">
+                
+                <!-- Correo -->
+                <div class="input-field-group">
+                    <label for="email"><i class="fa-regular fa-envelope"></i> Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" placeholder="nombre@ejemplo.com" required autocomplete="email">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-field-group">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <!-- Olvidaste contraseña -->
+                <div id="forgotPasswordContainer" class="forgot-pass-wrapper">
+                    <a href="#" id="forgotPasswordBtn">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <!-- Campos de Registro (Ocultos por defecto) -->
+                <div id="registerFields" class="register-extra-fields" style="display: none;">
+                    
+                    <div class="input-field-group">
+                        <label for="nombre"><i class="fa-regular fa-user"></i> Nombre Completo</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="nombre" placeholder="Ej: Dr. Roberto Gómez o Carlos Pérez">
+                        </div>
+                    </div>
+
+                    <div class="input-field-group">
+                        <label for="rol"><i class="fa-solid fa-id-badge"></i> Selecciona tu Perfil</label>
+                        <div class="input-wrapper">
+                            <select id="rol">
+                                <option value="paciente">🤕 Paciente en Rehabilitación</option>
+                                <option value="doctor">👨‍⚕️ Fisioterapeuta / Médico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Botón de acción principal -->
+                <button type="submit" id="btnSubmitAuth" class="btn-primary btn-auth-submit">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+
+            </form>
+
+            <div class="auth-footer-help">
+                <p>
+                    <span id="toggleText">¿Aún no tienes una cuenta?</span> 
+                    <a href="#" id="toggleBtn" onclick="toggleModoAuth(event)">Crea una cuenta aquí</a>
+                </p>
+            </div>
+
+            <div class="auth-security-notice">
+                <i class="fa-solid fa-lock"></i> Conexión Segura con Cifrado en Tiempo Real
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script Inline Inmediato para Garantizar la Interactividad Visual de las Pestañas -->
+    <script>
+        // Detectar si está en file://
+        if (window.location.protocol === 'file:') {
+            const notice = document.getElementById('fileProtocolNotice');
+            if (notice) notice.style.display = 'block';
+        }
+
+        // Función global para alternar pestañas
+        window.cambiarModoAuth = function(esRegistro) {
+            window.isRegisteringMode = esRegistro;
+            
+            const registerFields = document.getElementById('registerFields');
+            const toggleText = document.getElementById('toggleText');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const btnSubmit = document.getElementById('btnSubmitAuth');
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const forgotContainer = document.getElementById('forgotPasswordContainer');
+            const inputNombre = document.getElementById('nombre');
+
+            if (esRegistro) {
+                if (registerFields) registerFields.style.display = 'block';
+                if (forgotContainer) forgotContainer.style.display = 'none';
+                if (toggleText) toggleText.innerText = "¿Ya tienes cuenta?";
+                if (toggleBtn) toggleBtn.innerText = "Inicia Sesión aquí";
+                if (btnSubmit) btnSubmit.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Cuenta';
+                if (tabRegister) tabRegister.classList.add('active');
+                if (tabLogin) tabLogin.classList.remove('active');
+                if (inputNombre) inputNombre.setAttribute('required', 'required');
+            } else {
+                if (registerFields) registerFields.style.display = 'none';
+                if (forgotContainer) forgotContainer.style.display = 'block';
+                if (toggleText) toggleText.innerText = "¿Aún no tienes una cuenta?";
+                if (toggleBtn) toggleBtn.innerText = "Crea una cuenta aquí";
+                if (btnSubmit) btnSubmit.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+                if (tabLogin) tabLogin.classList.add('active');
+                if (tabRegister) tabRegister.classList.remove('active');
+                if (inputNombre) inputNombre.removeAttribute('required');
+            }
+        };
+
+        window.toggleModoAuth = function(e) {
+            if (e) e.preventDefault();
+            window.cambiarModoAuth(!window.isRegisteringMode);
+        };
+
+        // Leer parámetro ?mode=register de la URL
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('mode') === 'register') {
+                window.cambiarModoAuth(true);
+            } else {
+                window.cambiarModoAuth(false);
+            }
+        });
+    </script>
+
+    <!-- Script de Firebase Auth -->
+    <script type="module" src="./js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/pwa-install.js" defer></script>
+</body>
+</html>

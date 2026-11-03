@@ -3,54 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIRA - Login</title>
+    <title>SIRA - Sistema Inteligente De Rehabilitación Asistida</title>
+    
+    <!-- Metadatos PWA para Móvil (Android & iOS) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIRA">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+    <!-- Fuentes y Estilos -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="landing-body">
 
-    <div class="login-container">
-        <div class="login-box">
-            <img src="img/logo-sira.png.png" alt="Logo SIRA" class="logo-login">
+    <!-- =========================================
+         BARRA DE NAVEGACIÓN PRINCIPAL
+         ========================================= -->
+    <header class="landing-nav-header">
+        <div class="landing-nav-container">
             
-            <h1 style="margin-bottom: 10px;">SIRA</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Sistema Inteligente De Rehabilitación Asistida</p>
-
-            <form id="authForm">
-                <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Correo Electrónico</div>
-                <input type="email" id="email" placeholder="usuario@ejemplo.com" required>
-
-                <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Contraseña</div>
-                <input type="password" id="password" placeholder="••••••••" required>
-
-                <div style="text-align: right; margin-bottom: 15px;">
-                    <a href="#" id="forgotPasswordBtn" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+            <a href="index.html" class="landing-brand">
+                <img src="img/logo-sira.png.png" alt="Logo SIRA" class="landing-logo-img">
+                <div class="landing-brand-text">
+                    <span class="brand-title">SIRA</span>
+                    <span class="brand-sub">TeleRehab AI</span>
                 </div>
+            </a>
 
-                <div id="registerFields" style="display: none;">
-                    <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Nombre Completo</div>
-                    <input type="text" id="nombre" placeholder="Tu nombre real">
+            <nav class="landing-menu">
+                <a href="#inicio" class="nav-link active">Inicio</a>
+                <a href="#sistema" class="nav-link">El Sistema</a>
+                <a href="#como-funciona" class="nav-link">¿Cómo Funciona?</a>
+                <a href="#modulos" class="nav-link">Módulos</a>
+                <a href="#ejercicios" class="nav-link">Ejercicios</a>
+                <a href="#beneficios" class="nav-link">Beneficios</a>
+            </nav>
 
-                    <div style="text-align: left; margin-bottom: 5px; font-size: 0.9rem;">Rol</div>
-                    <select id="rol">
-                        <option value="paciente">Soy Paciente 🤕</option>
-                        <option value="doctor">Soy Fisioterapeuta 👨‍⚕️</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px; padding: 15px;">
-                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+            <div class="landing-actions">
+                <button type="button" onclick="instalarPWA()" class="btn" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.82rem; padding: 7px 14px; border-radius: 20px;">
+                    <i class="fa-solid fa-mobile-screen-button"></i> App Móvil
                 </button>
-            </form>
+                <a href="login.html" class="btn-landing-login">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </a>
+                <a href="login.html?mode=register" class="btn-landing-cta">
+                    <i class="fa-solid fa-user-plus"></i> Registrarse
+                </a>
+            </div>
 
-            <p style="margin-top: 20px; font-size: 0.9rem;">
-                <span id="toggleText">¿No tienes cuenta?</span> 
-                <a href="#" id="toggleBtn" style="color: var(--primary); font-weight: bold;">Regístrate aquí</a>
-            </p>
+            <!-- Botón de Menú Móvil -->
+            <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Abrir menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
-    </div>
 
-    <script type="module" src="./js/auth.js"></script>
+        <!-- Menú Móvil Desplegable -->
+        <div class="mobile-nav-drawer" id="mobileNavDrawer">
+            <a href="#inicio" class="mobile-nav-link">Inicio</a>
+            <a href="#sistema" class="mobile-nav-link">El Sistema</a>
+            <a href="#como-funciona" class="mobile-nav-link">¿Cómo Funciona?</a>
+            <a href="#modulos" class="mobile-nav-link">Módulos</a>
+            <a href="#ejercicios" class="mobile-nav-link">Ejercicios</a>
+            <a href="#beneficios" class="mobile-nav-link">Beneficios</a>
+            <div class="mobile-drawer-btns">
+                <button type="button" onclick="instalarPWA()" class="btn" style="width: 100%; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); font-size: 0.95rem; padding: 11px; margin-bottom: 8px;">
+                    <i class="fa-solid fa-mobile-screen-button"></i> Instalar App en el Celular
+                </button>
+                <a href="login.html" class="btn-landing-login" style="width: 100%; text-align: center;">Iniciar Sesión</a>
+                <a href="login.html?mode=register" class="btn-landing-cta" style="width: 100%; text-align: center;">Registrarse</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================
+         HERO SECTION (PORTADA PRINCIPAL)
+         ========================================= -->
+    <section id="inicio" class="hero-section">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-container">
+            
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    <span>Inteligencia Artificial y Visión por Computadora</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Rehabilitación Física Inteligente y <span class="gradient-text">Asistida por IA</span>
+                </h1>
+
+                <p class="hero-description">
+                    <strong>SIRA</strong> transforma cualquier cámara web en una estación clínica de telerehabilitación. Analiza movimientos articulares en tiempo real, verifica amplitudes y conecta a pacientes con fisioterapeutas sin necesidad de sensores costosos.
+                </p>
+
+                <div class="hero-btn-group">
+                    <a href="login.html" class="btn-hero-primary">
+                        <span>Ingresar a la Plataforma</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="#como-funciona" class="btn-hero-secondary">
+                        <i class="fa-solid fa-circle-play"></i>
+                        <span>Ver Cómo Funciona</span>
+                    </a>
+                </div>
+
+                <div class="hero-trust-row">
+                    <div class="trust-item">
+                        <i class="fa-solid fa-shield-halved text-primary"></i>
+                        <span>Privacidad en el Navegador</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fa-solid fa-bolt text-warning"></i>
+                        <span>Feedback Biomecánico 30 FPS</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fa-solid fa-chart-line text-success"></i>
+                        <span>Reportes Clínicos en PDF</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOCKUP VIRTUAL INTERACTIVO DE VISIÓN IA -->
+            <div class="hero-visual">
+                <div class="ai-mockup-frame">
+                    
+                    <!-- Barra de estado del Monitor -->
+                    <div class="mockup-top-bar">
+                        <div class="mockup-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="mockup-stream-title">
+                            <i class="fa-solid fa-camera"></i> LIVE POSE TRACKING • MEDIAPIPE HD
+                        </div>
+                        <div class="mockup-live-indicator">
+                            <span class="live-dot"></span> EN VIVO
+                        </div>
+                    </div>
+
+                    <!-- Lienzo visual de detección articular -->
+                    <div class="mockup-canvas-area">
+                        <!-- Silueta con esqueleto cibernético -->
+                        <div class="skeleton-visual-wrapper">
+                            <svg class="skeleton-svg" viewBox="0 0 300 360">
+                                <!-- Líneas de articulación (Huesos del cuerpo) -->
+                                <line x1="150" y1="80" x2="150" y2="160" class="bone-line core"></line>
+                                <line x1="150" y1="100" x2="110" y2="150" class="bone-line active-arm"></line>
+                                <line x1="110" y1="150" x2="90" y2="115" class="bone-line active-forearm animate-curl"></line>
+                                <line x1="150" y1="100" x2="190" y2="160" class="bone-line other-arm"></line>
+                                <line x1="190" y1="160" x2="195" y2="215" class="bone-line other-arm"></line>
+                                <line x1="150" y1="160" x2="125" y2="240" class="bone-line leg"></line>
+                                <line x1="125" y1="240" x2="120" y2="330" class="bone-line leg"></line>
+                                <line x1="150" y1="160" x2="175" y2="240" class="bone-line leg"></line>
+                                <line x1="175" y1="240" x2="180" y2="330" class="bone-line leg"></line>
+
+                                <!-- Nodos articulares (Landmarks de MediaPipe) -->
+                                <circle cx="150" cy="55" r="14" class="joint-node head"></circle>
+                                <circle cx="150" cy="100" r="6" class="joint-node"></circle>
+                                <circle cx="110" cy="150" r="7" class="joint-node focus-joint"></circle>
+                                <circle cx="90" cy="115" r="6" class="joint-node focus-hand"></circle>
+                                <circle cx="190" cy="160" r="6" class="joint-node"></circle>
+                                <circle cx="150" cy="160" r="6" class="joint-node"></circle>
+                                <circle cx="125" cy="240" r="6" class="joint-node"></circle>
+                                <circle cx="175" cy="240" r="6" class="joint-node"></circle>
+                            </svg>
+
+                            <!-- Medición angular flotante -->
+                            <div class="angle-floating-hud">
+                                <span class="angle-val">42°</span>
+                                <span class="angle-tag">Flexión Máxima</span>
+                            </div>
+                        </div>
+
+                        <!-- Panel HUD Superior Izquierdo -->
+                        <div class="mockup-hud-stat">
+                            <span class="hud-label">EJERCICIO</span>
+                            <span class="hud-value-highlight">Flexión de Codo</span>
+                            <div class="hud-sub-progress">
+                                <span>Progreso: <strong>8 / 10</strong></span>
+                                <div class="hud-mini-bar">
+                                    <div class="hud-bar-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Flotante Inferior -->
+                        <div class="mockup-hud-feedback">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            <span>¡Rango Óptimo! Mantén la postura</span>
+                        </div>
+
+                        <!-- Card Flotante de Conexión Médica -->
+                        <div class="mockup-floating-doctor">
+                            <div class="dr-avatar-mini">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+                            <div class="dr-meta">
+                                <strong>Dr. Fisioterapeuta</strong>
+                                <small>Supervisando en tiempo real</small>
+                            </div>
+                            <span class="badge-online">En Línea</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =========================================
+         BANDA DE INDICADORES Y NÚMEROS CLAVE
+         ========================================= -->
+    <section class="stats-strip">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-number">100%</div>
+                <div class="stat-title">Procesamiento Local</div>
+                <div class="stat-desc">El video nunca sale de tu cámara (Edge AI)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">33</div>
+                <div class="stat-title">Articulaciones Rastreadas</div>
+                <div class="stat-desc">Detección biomecánica con Google MediaPipe</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">0 $</div>
+                <div class="stat-title">Hardware Adicional</div>
+                <div class="stat-desc">Funciona en laptops, tablets y smartphones</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">3</div>
+                <div class="stat-title">Perfiles Integrados</div>
+                <div class="stat-desc">Paciente, Fisioterapeuta y Administrador</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN: EL SISTEMA SIRA
+         ========================================= -->
+    <section id="sistema" class="section-landing">
+        <div class="landing-container">
+            <div class="section-header">
+                <span class="section-badge">Visión Integral</span>
+                <h2 class="section-title">¿Qué es el Sistema SIRA?</h2>
+                <p class="section-subtitle">
+                    SIRA es una plataforma integral de salud digital creada para cerrar la brecha entre la consulta clínica y el hogar del paciente, garantizando que cada ejercicio prescrito se realice con la técnica correcta.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                
+                <div class="feature-card">
+                    <div class="feature-icon icon-blue">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h3>Visión Artificial en Vivo</h3>
+                    <p>Calcula ángulos de articulación (hombros, codos, cadera) en tiempo real para contar repeticiones y corregir posturas de inmediato.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-green">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <h3>Evaluación del Dolor (EVA)</h3>
+                    <p>Al concluir cada serie, el paciente califica su nivel de dolor en escala de 1 a 10, aportando datos de evolución al especialista.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-purple">
+                        <i class="fa-solid fa-file-medical"></i>
+                    </div>
+                    <h3>Expedientes e Informes PDF</h3>
+                    <p>Generación instantánea de reportes clínicos en PDF y analítica histórica de cumplimiento para sustentar el alta terapéutica.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-orange">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <h3>Telemetría y WhatsApp</h3>
+                    <p>Comunicación ágil entre doctor y paciente mediante enlaces directos a WhatsApp para felicitar progresos o ajustar dosis terapéuticas.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-cyan">
+                        <i class="fa-solid fa-book-medical"></i>
+                    </div>
+                    <h3>Biblioteca de Tutoriales</h3>
+                    <p>Guías visuales paso a paso con videos explicativos e instrucciones claras sobre postura, respiración y ángulos meta.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-red">
+                        <i class="fa-solid fa-shield-virus"></i>
+                    </div>
+                    <h3>Auditoría y Bitácora</h3>
+                    <p>Registro inmutable de todas las acciones del sistema para garantizar trazabilidad médica, seguridad y control administrativo.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN: ¿CÓMO FUNCIONA? (PASO A PASO)
+         ========================================= -->
+    <section id="como-funciona" class="section-landing section-darker">
+        <div class="landing-container">
+            <div class="section-header">
+                <span class="section-badge">Metodología Clínica</span>
+                <h2 class="section-title">El Flujo de Rehabilitación Inteligente</h2>
+                <p class="section-subtitle">Diseñado para que tanto especialistas como pacientes disfruten de una experiencia intuitiva y sin fricción.</p>
+            </div>
+
+            <div class="workflow-steps">
+                
+                <div class="workflow-step-card">
+                    <div class="step-badge-number">1</div>
+                    <div class="step-icon-wrap">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <h3>1. Prescripción Médica</h3>
+                    <p>El fisioterapeuta selecciona al paciente en su panel, escoge el ejercicio terapéutico adecuado y define la meta de repeticiones.</p>
+                </div>
+
+                <div class="workflow-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+                <div class="workflow-step-card">
+                    <div class="step-badge-number">2</div>
+                    <div class="step-icon-wrap">
+                        <i class="fa-solid fa-video"></i>
+                    </div>
+                    <h3>2. Ejecución Asistida</h3>
+                    <p>El paciente enciende su cámara. SIRA detecta los puntos articulares, valida la amplitud de movimiento y cuenta cada repetición válida.</p>
+                </div>
+
+                <div class="workflow-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+                <div class="workflow-step-card">
+                    <div class="step-badge-number">3</div>
+                    <div class="step-icon-wrap">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3>3. Telemetría y Evolución</h3>
+                    <p>Se almacena la sesión, el paciente indica su percepción de dolor y el médico recibe las gráficas de evolución al instante.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN: MÓDULOS DEL SISTEMA (ROLES)
+         ========================================= -->
+    <section id="modulos" class="section-landing">
+        <div class="landing-container">
+            <div class="section-header">
+                <span class="section-badge">Experiencia Especializada</span>
+                <h2 class="section-title">Tres Módulos, Un Solo Ecosistema</h2>
+                <p class="section-subtitle">Cada perfil cuenta con herramientas optimizadas para sus responsabilidades.</p>
+            </div>
+
+            <div class="roles-showcase-grid">
+                
+                <!-- Tarjeta Paciente -->
+                <div class="role-box">
+                    <div class="role-header">
+                        <div class="role-avatar patient-av">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <h3>Portal del Paciente</h3>
+                            <span class="role-pill">Para quien se rehabilita</span>
+                        </div>
+                    </div>
+                    <ul class="role-features-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Directorio de fisioterapeutas disponibles.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Bandeja de ejercicios pendientes asignados.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Monitor interactivo con cámara y HUD en tiempo real.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Registro de nivel de dolor post-ejercicio.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Guía y biblioteca con videos instructivos.</li>
+                    </ul>
+                    <a href="login.html" class="role-btn-link">Acceder como Paciente <i class="fa-solid fa-angle-right"></i></a>
+                </div>
+
+                <!-- Tarjeta Doctor -->
+                <div class="role-box featured-role">
+                    <div class="popular-ribbon">Módulo Clínico</div>
+                    <div class="role-header">
+                        <div class="role-avatar doctor-av">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <div>
+                            <h3>Panel Fisioterapeuta</h3>
+                            <span class="role-pill">Para especialistas</span>
+                        </div>
+                    </div>
+                    <ul class="role-features-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Recepción y gestión de solicitudes de pacientes.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Asignación personalizada de rutinas y metas.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Gráficas de rendimiento temporal con Chart.js.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Exportación de reportes clínicos oficiales en PDF.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Botón de seguimiento instantáneo por WhatsApp.</li>
+                    </ul>
+                    <a href="login.html" class="role-btn-link">Acceder como Terapeuta <i class="fa-solid fa-angle-right"></i></a>
+                </div>
+
+                <!-- Tarjeta Administrador -->
+                <div class="role-box">
+                    <div class="role-header">
+                        <div class="role-avatar admin-av">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h3>Panel Administrador</h3>
+                            <span class="role-pill">Gobernanza del Sistema</span>
+                        </div>
+                    </div>
+                    <ul class="role-features-list">
+                        <li><i class="fa-solid fa-circle-check"></i> Gestión y cambio de roles (Doctor / Paciente).</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Bloqueo y desbloqueo de usuarios con auditoría.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Restablecimiento de credenciales de acceso.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Bitácora inmutable de eventos con filtro por fechas.</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Métricas globales de rutinas y adopción clínica.</li>
+                    </ul>
+                    <a href="login.html" class="role-btn-link">Acceder como Admin <i class="fa-solid fa-angle-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN: CATÁLOGO DE EJERCICIOS
+         ========================================= -->
+    <section id="ejercicios" class="section-landing section-darker">
+        <div class="landing-container">
+            <div class="section-header">
+                <span class="section-badge">Biomecánica Computacional</span>
+                <h2 class="section-title">Ejercicios Integrados con IA</h2>
+                <p class="section-subtitle">Medición milimétrica de ángulos articulares para prevenir sobrecargas y asegurar la técnica adecuada.</p>
+            </div>
+
+            <div class="exercises-landing-grid">
+                
+                <div class="exercise-landing-card">
+                    <div class="exercise-media-placeholder">
+                        <div class="exercise-badge-corner">Bíceps / Codo</div>
+                        <i class="fa-solid fa-dumbbell"></i>
+                        <div class="angle-demo-pill">Rango: 45° a 160°</div>
+                    </div>
+                    <div class="exercise-body">
+                        <h3>Flexión de Codo</h3>
+                        <p>Analiza el ángulo formado entre hombro, codo y muñeca. Exige una extensión completa inicial (>160°) y una flexión concéntrica cerrada (<45°) para sumar la repetición.</p>
+                        <div class="exercise-tags">
+                            <span><i class="fa-solid fa-bone"></i> Húmero-Radial</span>
+                            <span><i class="fa-solid fa-check"></i> Anti-Trampas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-landing-card">
+                    <div class="exercise-media-placeholder">
+                        <div class="exercise-badge-corner">Hombro / Abducción</div>
+                        <i class="fa-solid fa-person-walking"></i>
+                        <div class="angle-demo-pill">Rango: 25° a 75°+</div>
+                    </div>
+                    <div class="exercise-body">
+                        <h3>Elevación Lateral</h3>
+                        <p>Monitorea la abducción en la articulación gleno-humeral evaluando el ángulo entre cadera, hombro y codo. Asegura que el brazo alcance la horizontal sin sobrepasar el hombro.</p>
+                        <div class="exercise-tags">
+                            <span><i class="fa-solid fa-bone"></i> Deltoides</span>
+                            <span><i class="fa-solid fa-check"></i> Postura de Torso</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="biblioteca.html" class="btn-outline-primary">
+                    <i class="fa-solid fa-book-open"></i> Explorar Biblioteca Completa de Tutoriales
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN: BENEFICIOS
+         ========================================= -->
+    <section id="beneficios" class="section-landing">
+        <div class="landing-container">
+            <div class="section-header">
+                <span class="section-badge">Impacto Transformador</span>
+                <h2 class="section-title">¿Por qué Elegir SIRA?</h2>
+                <p class="section-subtitle">Beneficios clínicos y operativos frente a las terapias tradicionales domiciliarias no supervisadas.</p>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-number">01</div>
+                    <h3>Adherencia al Tratamiento</h3>
+                    <p>Los pacientes que reciben retroalimentación visual en vivo y gamificación completan hasta un 65% más de sus rutinas prescritas.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-number">02</div>
+                    <h3>Datos Clínicos Objetivos</h3>
+                    <p>Sustituye el tradicional *"creo que hice 10"* por registros fidedignos con fecha, hora, repeticiones completadas y nivel de dolor reportado.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-number">03</div>
+                    <h3>Inclusión y Accesibilidad</h3>
+                    <p>Pacientes en zonas rurales o con movilidad reducida pueden rehabilitarse desde su hogar sin incurrir en traslados costosos.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-number">04</div>
+                    <h3>Optimización del Tiempo Médico</h3>
+                    <p>El fisioterapeuta atiende a más pacientes simultáneamente al automatizar la supervisión mecánica y recibir alertas de evolución.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         BANNER FINAL DE LLAMADA A LA ACCIÓN (CTA)
+         ========================================= -->
+    <section class="landing-cta-banner">
+        <div class="landing-container">
+            <div class="cta-banner-content">
+                <h2>¿Listo para revolucionar tu rehabilitación física?</h2>
+                <p>Accede ahora al sistema SIRA y comienza a disfrutar del monitoreo inteligente con visión por computadora.</p>
+                <div class="cta-banner-buttons">
+                    <a href="login.html" class="btn-hero-primary" style="padding: 16px 36px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión en SIRA
+                    </a>
+                    <a href="login.html?mode=register" class="btn-hero-secondary" style="padding: 16px 36px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-user-plus"></i> Crear Cuenta Gratuita
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         PIE DE PÁGINA (FOOTER)
+         ========================================= -->
+    <footer class="landing-footer">
+        <div class="landing-container">
+            <div class="footer-grid">
+                
+                <div class="footer-col-main">
+                    <div class="landing-brand" style="margin-bottom: 15px;">
+                        <img src="img/logo-sira.png.png" alt="Logo SIRA" style="height: 50px; width: auto;">
+                        <div class="landing-brand-text">
+                            <span class="brand-title">SIRA</span>
+                            <span class="brand-sub">TeleRehab AI</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; max-width: 380px;">
+                        Sistema Inteligente De Rehabilitación Asistida. Proyecto de innovación en salud digital para la supervisión y optimización de terapias físicas mediante visión artificial.
+                    </p>
+                    <div class="footer-social-links">
+                        <span class="badge-academico"><i class="fa-solid fa-graduation-cap"></i> Proyecto de Diplomado</span>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#sistema">El Sistema</a></li>
+                        <li><a href="#como-funciona">¿Cómo Funciona?</a></li>
+                        <li><a href="#modulos">Módulos</a></li>
+                        <li><a href="#ejercicios">Ejercicios</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Plataforma</h4>
+                    <ul>
+                        <li><a href="login.html">Iniciar Sesión</a></li>
+                        <li><a href="login.html?mode=register">Crear Cuenta</a></li>
+                        <li><a href="biblioteca.html">Biblioteca de Ejercicios</a></li>
+                        <li><a href="Diccionario_Real.html">Diccionario de Datos</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Seguridad y Privacidad</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">
+                        <i class="fa-solid fa-lock text-primary"></i> Las imágenes de cámara no son grabadas ni transmitidas a servidores. El cálculo del esqueleto se procesa íntegramente en tu navegador.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 SIRA - Sistema Inteligente De Rehabilitación Asistida. Todos los derechos reservados.</p>
+                <div class="footer-credits">
+                    Tecnología: Google MediaPipe • Firebase • Chart.js
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script para navegación móvil y comportamiento interactivo -->
+    <script>
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const mobileDrawer = document.getElementById('mobileNavDrawer');
+
+        if (mobileBtn && mobileDrawer) {
+            mobileBtn.addEventListener('click', () => {
+                mobileDrawer.classList.toggle('open');
+                const isOpen = mobileDrawer.classList.contains('open');
+                mobileBtn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+            });
+
+            // Cerrar menú al hacer clic en un enlace
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileDrawer.classList.remove('open');
+                    mobileBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                });
+            });
+        }
+    </script>
+
+    <!-- PWA Service Worker & Install Handler -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/pwa-install.js" defer></script>
 </body>
 </html>

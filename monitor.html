@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor IA - TeleRehab</title>
+    <title>SIRA - Monitor IA Biomecánico</title>
     
+    <!-- Metadatos PWA para Móvil (Android & iOS) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030712">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIRA">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Librerías de MediaPipe Pose -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -16,80 +27,159 @@
     <style>
         body {
             overflow: hidden;
-            background-color: #000;
+            background-color: #030712;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
         .monitor-header {
             position: absolute;
             top: 0; left: 0; width: 100%;
-            padding: 15px;
+            padding: 16px 24px;
             z-index: 100;
             display: flex;
             justify-content: space-between;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.95), transparent);
+            box-sizing: border-box;
+            gap: 12px;
         }
 
-        /* AJUSTE DE CÁMARA (Anti-Zoom y Anti-Pixelado) */
         .output_canvas {
             position: absolute;
             top: 0; left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* ESTO EVITA EL ZOOM EXCESIVO */
+            object-fit: contain;
         }
 
-        /* HUD (Paneles Flotantes) */
+        /* Paneles HUD Flotantes */
         .hud-panel {
             position: absolute;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(14px);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
             color: white;
-            z-index: 10; /* Asegura que flote sobre el video */
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
 
-        .hud-top-left { top: 60px; left: 20px; width: 200px; }
+        .hud-top-left {
+            top: 75px;
+            left: 20px;
+            min-width: 220px;
+        }
         
         .hud-bottom-center { 
-            bottom: 20px; 
+            bottom: 25px; 
             left: 50%; 
             transform: translateX(-50%);
             text-align: center;
             width: 90%;
-            max-width: 500px;
-            border-top: 4px solid #3b82f6;
+            max-width: 540px;
+            border-top: 3px solid #3b82f6;
+            background: rgba(15, 23, 42, 0.94);
         }
 
         .big-count {
-            font-size: 3rem;
-            font-weight: 800;
-            color: #3b82f6;
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             line-height: 1;
         }
 
         .feedback-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #f59e0b;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fbbf24;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        .btn-exit {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 15px;
+        .btn-exit-monitor {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 8px 18px;
             border-radius: 30px;
             text-decoration: none;
-            font-weight: bold;
-            display: flex; align-items: center; gap: 8px;
-            font-size: 0.9rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            transition: all 0.25s ease;
+        }
+        .btn-exit-monitor:hover {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+
+        .hud-control-btn {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+        .hud-control-btn:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+        }
+
+        .ai-pulse-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .monitor-header {
+                padding: 12px 14px;
+                flex-wrap: wrap;
+            }
+            .hud-controls-group {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                display: flex;
+                margin-top: 6px;
+            }
+            .hud-top-left {
+                top: 110px;
+                left: 14px;
+                min-width: 170px;
+                padding: 12px 14px;
+            }
+            .big-count {
+                font-size: 2.4rem;
+            }
         }
     </style>
 </head>
@@ -98,31 +188,87 @@
     <video class="input_video" style="display:none" playsinline webkit-playsinline muted autoplay></video>
     <canvas class="output_canvas"></canvas>
 
+    <!-- Encabezado del Monitor -->
     <div class="monitor-header">
-        <a href="dashboard-paciente.html" class="btn-exit">
-            <i class="fa-solid fa-xmark"></i> Salir
+        <a href="dashboard-paciente.html" class="btn-exit-monitor" onclick="return confirmarSalida(event)">
+            <i class="fa-solid fa-arrow-left"></i> Salir
         </a>
-        <div style="color: white; text-align: right;">
-            <div style="font-size: 0.7rem; opacity: 0.7;">EJERCICIO</div>
-            <div id="lblExercise" style="font-weight: bold;">...</div>
+
+        <!-- Controles Rápidos de Sesión (Lado y Voz) -->
+        <div class="hud-controls-group" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btnToggleSide" class="hud-control-btn" title="Alternar entre Lado Derecho e Izquierdo">
+                <i class="fa-solid fa-arrows-rotate text-primary"></i> <span id="lblSideName">Lado Derecho</span>
+            </button>
+            <button id="btnToggleVoice" class="hud-control-btn" title="Activar/Silenciar Asistente de Voz">
+                <i class="fa-solid fa-volume-high text-success" id="iconVoice"></i> <span id="lblVoiceStatus">Voz Activa</span>
+            </button>
+        </div>
+
+        <div style="text-align: right; display: flex; align-items: center; gap: 12px;">
+            <div class="ai-pulse-pill">
+                <span class="pulse-dot"></span> SIRA AI LIVE
+            </div>
+            <div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Ejercicio</div>
+                <div id="lblExercise" style="font-weight: 800; font-size: 1.05rem; color: white;">...</div>
+            </div>
         </div>
     </div>
 
+    <!-- HUD de Progreso y Biomecánica (Superior Izquierda) -->
     <div class="hud-panel hud-top-left">
-        <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 5px;">PROGRESO</div>
-        <div style="display: flex; align-items: baseline; gap: 10px;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">REPETICIONES</div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
             <span id="lblReps" class="big-count">0</span>
-            <span style="font-size: 1rem; opacity: 0.8;">/ <span id="lblMeta">0</span></span>
+            <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 600;">/ <span id="lblMeta">0</span></span>
         </div>
-        <div style="width: 100%; height: 8px; background: #333; margin-top: 10px; border-radius: 4px; overflow: hidden;">
-            <div id="progressBar" style="width: 0%; height: 100%; background: #10b981; transition: width 0.3s ease;"></div>
+        
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); margin-top: 10px; border-radius: 4px; overflow: hidden;">
+            <div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); transition: width 0.3s ease; box-shadow: 0 0 10px #10b981;"></div>
+        </div>
+
+        <!-- Medidor de Ángulo Articular en Tiempo Real -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--text-muted);">
+            <span>Ángulo Articular:</span>
+            <strong id="lblAngleMeter" style="color: #38bdf8; font-size: 1.1rem;">--°</strong>
+        </div>
+
+        <!-- Alerta de Compensación Postural (Anti-Trampa) -->
+        <div id="postureAlert" style="display: none; margin-top: 10px; padding: 6px 10px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 8px; color: #fca5a5; font-size: 0.74rem; font-weight: 700; text-align: center;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Torso Inclinado
         </div>
     </div>
 
+    <!-- HUD de Feedback y Guiado en Vivo (Inferior Centro) -->
     <div class="hud-panel hud-bottom-center">
-        <div id="feedback" class="feedback-text">⌛ Cargando IA...</div>
+        <div id="feedback" class="feedback-text">
+            <i class="fa-solid fa-spinner fa-spin"></i> Inicializando IA...
+        </div>
+        <div id="lblSubFeedback" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+            Asegúrate de que tu cuerpo esté completamente visible
+        </div>
     </div>
 
+    <script>
+        function confirmarSalida(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Terminar sesión antes de tiempo?',
+                text: 'Si sales ahora, las repeticiones incompletas no se registrarán como sesión finalizada.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'Sí, salir',
+                cancelButtonText: 'Continuar ejercicio'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    window.location.href = "dashboard-paciente.html";
+                }
+            });
+            return false;
+        }
+    </script>
     <script type="module" src="./js/vision.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

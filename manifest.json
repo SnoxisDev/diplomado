@@ -1,0 +1,49 @@
+{
+  "name": "SIRA - Tele-Rehabilitación IA",
+  "short_name": "SIRA",
+  "description": "Sistema Inteligente de Rehabilitación Asistida con Visión Biomecánica por Inteligencia Artificial",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "lang": "es",
+  "categories": ["medical", "health", "fitness"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mi Rutina",
+      "short_name": "Rutina",
+      "description": "Ver mis ejercicios asignados",
+      "url": "./dashboard-paciente.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Biblioteca Clínica",
+      "short_name": "Biblioteca",
+      "description": "Explorar guía de biomecánica",
+      "url": "./biblioteca.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

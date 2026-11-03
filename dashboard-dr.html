@@ -3,115 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Médico - TeleRehab AI</title>
+    <title>SIRA - Panel Fisioterapeuta</title>
+    
+    <!-- Metadatos PWA para Móvil (Android & iOS) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIRA">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Librerías de Gráficos y PDF -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
+    <!-- Encabezado Superior -->
     <div class="header">
-    
-    <a href="perfil.html" class="profile-circle">
-        <img src="https://ui-avatars.com/api/?name=Dr&background=random" alt="Perfil" id="headerAvatar">
-    </a>
+        
+        <a href="perfil.html" class="profile-circle" title="Editar Mi Perfil">
+            <img src="https://ui-avatars.com/api/?name=Dr&background=random" alt="Perfil" id="headerAvatar">
+        </a>
 
-    <div class="logo-center">
-        <img src="img/logo-sira.png.png" alt="SIRA" class="logo-nav">
+        <div class="logo-center">
+            <a href="index.html" title="Página Principal SIRA">
+                <img src="img/logo-sira.png.png" alt="SIRA" class="logo-nav">
+            </a>
+        </div>
+
+        <div class="toolbar-right">
+            
+            <div class="notification-wrapper">
+                <button id="bellBtn" class="icon-btn" title="Solicitudes Entrantes">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notificationBadge" class="badge-dot" style="display:none;"></span>
+                </button>
+                
+                <div id="dropdownMenu" class="dropdown-content">
+                    <div id="requestsList">
+                        <div style="padding:15px; text-align:center; color:gray; font-size:0.9rem;">
+                            Cargando solicitudes...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="logoutBtn" class="icon-btn logout-color" title="Cerrar Sesión">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+
     </div>
 
-    <div class="toolbar-right">
+    <div class="container">
         
-        <div class="notification-wrapper">
-            <button id="bellBtn" class="icon-btn">
-                <i class="fa-regular fa-bell"></i>
-                <span id="notificationBadge" class="badge-dot" style="display:none;"></span>
-            </button>
-            
-            <div id="dropdownMenu" class="dropdown-content">
-                <div id="requestsList">
-                    </div>
+        <!-- Banner de Bienvenida del Doctor -->
+        <div class="dashboard-hero-banner">
+            <div class="hero-user-info">
+                <div class="hero-avatar-large" id="heroDoctorAvatar">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="hero-welcome-text">
+                    <h2>Bienvenido, <span id="doctorNameHeader">Fisioterapeuta</span> 👨‍⚕️</h2>
+                    <p>Estación clínica de prescripción, análisis de telemetría y evolución articular con IA.</p>
+                </div>
+            </div>
+            <div>
+                <span class="hero-status-pill status-active">
+                    <i class="fa-solid fa-stethoscope"></i> Especialista Certificado SIRA
+                </span>
             </div>
         </div>
 
-        <button id="logoutBtn" class="icon-btn logout-color">
-            <i class="fa-solid fa-power-off"></i>
-        </button>
-    </div>
-
-</div>
-
-    <div class="container">
-        <div class="grid-container">
-            
-            <div class="card" style="min-height: 500px;">
-                <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-users"></i> Mis Pacientes
-                </h3>
-                <div id="patientsList" style="margin-top: 15px;">
-                    <p style="color: var(--text-muted);">Cargando lista...</p>
+        <!-- Fila de Indicadores y Métricas Rápidas del Doctor -->
+        <div class="quick-stats-grid">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Mis Pacientes</span>
+                    <span class="metric-value" id="stat-dr-pacientes">0</span>
                 </div>
             </div>
 
-            <div class="card">
-                <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-chart-line"></i> Progreso del Paciente
-                </h3>
-                
-                <div id="selectedPatientName" style="background: rgba(59, 130, 246, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 20px; color: var(--primary);">
-                    <i class="fa-solid fa-circle-info"></i> Selecciona un paciente para ver su evolución
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-purple">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Rutinas Enviadas</span>
+                    <span class="metric-value" id="stat-dr-rutinas">0</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Sesiones Completadas</span>
+                    <span class="metric-value" id="stat-dr-completados">0</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-orange">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Solicitudes Pendientes</span>
+                    <span class="metric-value" id="stat-dr-solicitudes">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Espacio de Trabajo Principal (2 Columnas en Desktop, 1 Columna en Móvil) -->
+        <div class="grid-container doctor-workspace-grid">
+            
+            <!-- Columna Izquierda: Mis Pacientes -->
+            <div class="card" style="min-height: 540px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-users text-primary"></i> Pacientes Activos
+                    </h3>
+                    <span id="badgeActivePatientsCount" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;">
+                        0 activos
+                    </span>
                 </div>
 
-                <div style="height: 250px; width: 100%; margin-bottom: 20px;">
+                <!-- Buscador de Pacientes en tiempo real -->
+                <div class="patient-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="patientSearchInput" placeholder="Buscar paciente por nombre...">
+                </div>
+
+                <!-- Lista de Pacientes -->
+                <div id="patientsList" style="display: flex; flex-direction: column; gap: 8px;">
+                    <p style="color: var(--text-muted); text-align: center; padding: 20px;">Cargando lista de pacientes...</p>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Expediente, Gráfico y Prescripción -->
+            <div class="card">
+                <div style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-chart-line text-primary"></i> Evolución y Prescripción
+                    </h3>
+                </div>
+                
+                <!-- Paciente Seleccionado Info Box -->
+                <div id="selectedPatientName" class="patient-selected-box">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem;">Selecciona un paciente</strong>
+                        <small style="color: var(--text-muted);">Haz clic en la lista izquierda para cargar su gráfico y asignar tareas.</small>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Rendimiento -->
+                <div style="height: 240px; width: 100%; margin-bottom: 25px; position: relative;">
                     <canvas id="patientChart"></canvas>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
 
-                <h4 style="margin-top: 0; color: var(--text-main);">Asignar Nueva Tarea</h4>
+                <!-- Formulario de Asignación de Rutinas -->
+                <h4 style="margin: 0 0 12px 0; color: var(--text-main); font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-calendar-plus" style="color: var(--success);"></i> Asignar Rutina con IA
+                </h4>
+
                 <form id="assignForm">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 15px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.8rem; color: var(--text-muted);">Ejercicio</label>
+                            <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 5px;">
+                                Tipo de Ejercicio
+                            </label>
                             <select id="exerciseSelect">
                                 <option value="flexion_codo">💪 Flexión Codo (Bíceps)</option>
                                 <option value="elevacion_lateral">🕊️ Elevación Lateral (Hombro)</option>
+                                <option value="elevacion_frontal">🎯 Elevación Frontal (Hombro)</option>
+                                <option value="sentadilla">🦵 Sentadilla Terapéutica (Rodilla)</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.8rem; color: var(--text-muted);">Meta Reps</label>
-                            <input type="number" id="repsMeta" placeholder="10" min="1" value="5">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 5px;">
+                                Extremidad / Lado
+                            </label>
+                            <select id="sideSelect">
+                                <option value="derecho">👉 Lado Derecho</option>
+                                <option value="izquierdo">👈 Lado Izquierdo</option>
+                            </select>
                         </div>
                     </div>
-                    <button type="submit" id="btnAssign" class="btn-assign" style="width: 100%;" disabled>
-                        <i class="fa-regular fa-paper-plane"></i> Enviar Rutina
+
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 5px;">
+                            Meta de Repeticiones
+                        </label>
+                        <input type="number" id="repsMeta" placeholder="10" min="1" value="5">
+                    </div>
+
+                    <!-- Botones Rápidos de Repeticiones -->
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Presets:</span>
+                        <div class="quick-reps-container" style="margin: 0;">
+                            <button type="button" class="btn-preset-reps" onclick="setPresetReps(5)">5 reps</button>
+                            <button type="button" class="btn-preset-reps" onclick="setPresetReps(10)">10 reps</button>
+                            <button type="button" class="btn-preset-reps" onclick="setPresetReps(15)">15 reps</button>
+                            <button type="button" class="btn-preset-reps" onclick="setPresetReps(20)">20 reps</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnAssign" class="btn-assign" style="width: 100%; padding: 13px; font-size: 0.95rem;" disabled>
+                        <i class="fa-regular fa-paper-plane"></i> Prescribir Rutina al Paciente
                     </button>
                 </form>
             </div>
 
         </div>
 
+        <!-- SECCIÓN INFERIOR: HISTORIAL CLÍNICO GLOBAL -->
         <div class="card" style="margin-top: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Historial Global</h3>
-                <button id="btnRefreshHistory" class="btn" style="background: var(--bg-hover); color: white;">
-                    <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-clock-rotate-left text-warning"></i> Historial Clínico de Sesiones
+                </h3>
+                <button id="btnRefreshHistory" class="btn" style="background: var(--bg-hover); color: white; font-size: 0.85rem; padding: 7px 14px;">
+                    <i class="fa-solid fa-arrows-rotate"></i> Actualizar Historial
                 </button>
             </div>
-            <div style="overflow-x: auto;">
+
+            <div class="table-responsive">
                 <table>
                     <thead>
-                        <tr><th>Paciente</th><th>Ejercicio</th><th>Rendimiento</th><th>Fecha</th><th>Acciones</th></tr>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Ejercicio Prescrito</th>
+                            <th>Rendimiento / Meta</th>
+                            <th>Fecha de Sesión</th>
+                            <th>Acciones Clínicas</th>
+                        </tr>
                     </thead>
-                    <tbody id="historyTableBody"></tbody>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="5" style="text-align:center; padding: 25px; color: var(--text-muted);">Cargando registros recientes...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
+
     </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Scripts -->
+    <script>
+        function setPresetReps(val) {
+            const input = document.getElementById('repsMeta');
+            if (input) input.value = val;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="./js/doctor.js"></script>
+    <script src="js/pwa-install.js" defer></script>
 </body>
 </html>

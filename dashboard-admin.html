@@ -6,234 +6,169 @@
     <title>SIRA - Panel de Administración</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            border-top: 4px solid var(--primary);
-        }
-        .stat-card h2 {
-            font-size: 2.5rem;
-            margin: 10px 0 0 0;
-            color: var(--text-main);
-        }
-        .stat-card p {
-            color: var(--text-muted);
-            margin: 0;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-        
-        /* Contenedor de filtros reparado */
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            align-items: flex-end;
-            background: var(--bg-main);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            width: 100%; /* Forzar a que no crezca de más */
-            box-sizing: border-box;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 140px; /* Reducido un poco para móviles */
-        }
-        .filter-group label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-        .filter-group input {
-            margin-bottom: 0;
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn-filter, .btn-clear {
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            height: 42px;
-            white-space: nowrap; /* Evita que el texto se parta feo */
-        }
-        .btn-filter {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-clear {
-            background: transparent;
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-        .btn-clear:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* ==========================================
-           REPARACIÓN RESPONSIVE DEFINITIVA
-           ========================================== */
-        
-        /* Bloqueamos el tamaño máximo de las tarjetas para que no se estiren */
-        .card {
-            max-width: 100%;
-            overflow: hidden; /* Oculta todo lo que intente salir de la tarjeta */
-        }
-
-        /* Aseguramos que la tabla pida sus 700px pero solo por dentro */
-        table {
-            width: 100%;
-            min-width: 700px; 
-        }
-        
-        /* Contenedor mágico blindado */
-        .table-responsive {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 15px;
-            padding-bottom: 10px; /* Espacio para la barrita de scroll */
-        }
-
-        @media (max-width: 768px) {
-            .filter-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-group {
-                width: 100%;
-            }
-            .btn-filter, .btn-clear {
-                width: 100%;
-                margin-top: 5px;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            /* Los botones de pestañas se apilan en teléfonos muy pequeños */
-            .tabs-rutinas {
-                flex-direction: column;
-            }
-            .tabs-rutinas button {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 <body>
 
+    <!-- Encabezado Superior -->
     <div class="header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="width: 40px; height: 40px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">AD</div>
-            <h2>Panel de Administrador</h2>
-        </div>
         
-        <button id="logoutBtn" class="btn-logout" title="Cerrar Sesión">
-            <i class="fa-solid fa-power-off"></i> Salir
-        </button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.95rem; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">
+                AD
+            </div>
+            <span style="font-weight: 700; font-size: 0.95rem; color: white; display: none;" class="desktop-only-text">Administración</span>
+        </div>
+
+        <div class="logo-center">
+            <a href="index.html" title="Página Principal SIRA">
+                <img src="img/logo-sira.png.png" alt="SIRA" class="logo-nav">
+            </a>
+        </div>
+
+        <div class="toolbar-right">
+            <button id="logoutBtn" class="icon-btn logout-color" title="Cerrar Sesión">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+
     </div>
-    
 
     <div class="container">
         
-        <div class="stats-grid">
-            <div class="stat-card">
-                <p><i class="fa-solid fa-users"></i> Total Usuarios</p>
-                <h2 id="stat-total-usuarios">0</h2>
+        <!-- Banner de Bienvenida del Administrador -->
+        <div class="dashboard-hero-banner">
+            <div class="hero-user-info">
+                <div class="hero-avatar-large" style="background: rgba(245, 158, 11, 0.15); border-color: var(--warning); color: var(--warning);">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="hero-welcome-text">
+                    <h2>Panel de Control y Auditoría 🛡️</h2>
+                    <p>Monitoreo global de usuarios, rutinas terapéuticas y trazabilidad inmutable del sistema.</p>
+                </div>
             </div>
-            <div class="stat-card" style="border-top-color: var(--secondary);">
-                <p><i class="fa-solid fa-user-injured"></i> Pacientes</p>
-                <h2 id="stat-pacientes">0</h2>
-            </div>
-            <div class="stat-card" style="border-top-color: var(--warning);">
-                <p><i class="fa-solid fa-user-doctor"></i> Doctores</p>
-                <h2 id="stat-doctores">0</h2>
-            </div>
-            <div class="stat-card" style="border-top-color: #28a745;">
-                <p><i class="fa-solid fa-check-double"></i> Rutinas Completadas</p>
-                <h2 id="stat-rutinas">0</h2>
+            <div>
+                <span class="hero-status-pill" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                    <i class="fa-solid fa-crown"></i> Administrador Maestro
+                </span>
             </div>
         </div>
 
+        <!-- Métricas Rápidas -->
+        <div class="quick-stats-grid">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Total Usuarios</span>
+                    <span class="metric-value" id="stat-total-usuarios">0</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-purple">
+                    <i class="fa-solid fa-user-injured"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Pacientes</span>
+                    <span class="metric-value" id="stat-pacientes">0</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-orange">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Fisioterapeutas</span>
+                    <span class="metric-value" id="stat-doctores">0</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box metric-icon-green">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Rutinas Concluidas</span>
+                    <span class="metric-value" id="stat-rutinas">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos de Gestión -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
             <div class="card" style="margin-bottom: 0;">
-                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.1rem;">Distribución de Usuarios</h3>
-                <div style="height: 250px; position: relative;">
+                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.05rem;">
+                    <i class="fa-solid fa-chart-pie text-primary"></i> Distribución de Usuarios
+                </h3>
+                <div style="height: 240px; position: relative;">
                     <canvas id="usersChart"></canvas>
                 </div>
             </div>
+
             <div class="card" style="margin-bottom: 0;">
-                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.1rem;">Estado de Rutinas</h3>
-                <div style="height: 250px; position: relative;">
+                <h3 style="margin-top: 0; text-align: center; color: var(--text-main); font-size: 1.05rem;">
+                    <i class="fa-solid fa-chart-bar text-warning"></i> Estado de Rutinas
+                </h3>
+                <div style="height: 240px; position: relative;">
                     <canvas id="routinesChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <!-- Tablas de Gestión y Auditoría -->
+        <div style="display: flex; flex-direction: column; gap: 25px;">
             
+            <!-- 1. Usuarios Registrados -->
             <div class="card">
-                <h3 style="color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-users-gear"></i> Usuarios Registrados
-                </h3>
+                <div style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-users-gear"></i> Gestión y Control de Usuarios
+                    </h3>
+                </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Rol</th>
-                                <th>Acción</th>
+                                <th>Usuario</th>
+                                <th>Rol del Sistema</th>
+                                <th>Acciones de Gobernanza</th>
                             </tr>
                         </thead>
                         <tbody id="adminUsersTable">
-                            <tr><td colspan="3">Cargando usuarios...</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Cargando usuarios...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- 2. Bitácora de Auditoría -->
             <div class="card">
-                <h3 style="color: var(--warning); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-clipboard-list"></i> Bitácora del Sistema
-                </h3>
+                <div style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: var(--warning); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-clipboard-list"></i> Bitácora de Eventos y Trazabilidad
+                    </h3>
+                </div>
                 
-                <div class="filter-container">
-                    <div class="filter-group">
-                        <label>Desde:</label>
-                        <input type="date" id="filtro-fecha-inicio">
+                <!-- Filtros de fecha con estilo responsivo -->
+                <div class="form-grid-2cols" style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; align-items: flex-end;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Desde:</label>
+                        <input type="date" id="filtro-fecha-inicio" style="margin-bottom: 0;">
                     </div>
-                    <div class="filter-group">
-                        <label>Hasta:</label>
-                        <input type="date" id="filtro-fecha-fin">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Hasta:</label>
+                        <input type="date" id="filtro-fecha-fin" style="margin-bottom: 0;">
                     </div>
-                    <button id="btn-filtrar-bitacora" class="btn-filter"><i class="fa-solid fa-search"></i> Filtrar</button>
-                    <button id="btn-limpiar-filtro" class="btn-clear"><i class="fa-solid fa-eraser"></i> Limpiar</button>
+                    <div style="grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 10px;">
+                        <button id="btn-filtrar-bitacora" class="btn-primary" style="flex: 1; padding: 10px;">
+                            <i class="fa-solid fa-magnifying-glass"></i> Filtrar Eventos
+                        </button>
+                        <button id="btn-limpiar-filtro" class="btn" style="background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px;">
+                            <i class="fa-solid fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
@@ -241,26 +176,29 @@
                         <thead>
                             <tr>
                                 <th>Fecha y Hora</th>
-                                <th>Acción</th>
-                                <th>Detalle</th>
+                                <th>Acción Registrada</th>
+                                <th>Detalle Técnico</th>
                             </tr>
                         </thead>
                         <tbody id="bitacoraTable">
-                            <tr><td colspan="3">Cargando bitácora...</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Cargando bitácora...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- 3. Control Global de Rutinas -->
             <div class="card">
-                <h3 style="color: #10b981; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0;">
-                    <i class="fa-solid fa-globe"></i> Control Global de Rutinas
-                </h3>
+                <div style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: #10b981; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-globe"></i> Control y Monitoreo Global de Rutinas
+                    </h3>
+                </div>
                 
-                <div class="tabs-rutinas" style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <button onclick="filtrarEstadoGlobal('todas')" class="btn" style="background: #334155; color: white; font-size: 0.8rem; flex-grow: 1;">Todas</button>
-                    <button onclick="filtrarEstadoGlobal('pendiente')" class="btn" style="background: var(--warning); color: black; font-size: 0.8rem; flex-grow: 1;">Solo Pendientes</button>
-                    <button onclick="filtrarEstadoGlobal('completado')" class="btn" style="background: var(--success); color: white; font-size: 0.8rem; flex-grow: 1;">Solo Completadas</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="filtrarEstadoGlobal('todas')" class="btn" style="background: #334155; color: white; font-size: 0.82rem; flex: 1;">Todas</button>
+                    <button onclick="filtrarEstadoGlobal('pendiente')" class="btn" style="background: var(--warning); color: black; font-size: 0.82rem; flex: 1;">Solo Pendientes</button>
+                    <button onclick="filtrarEstadoGlobal('completado')" class="btn" style="background: var(--success); color: white; font-size: 0.82rem; flex: 1;">Solo Completadas</button>
                 </div>
 
                 <div class="table-responsive">
@@ -268,24 +206,23 @@
                         <thead>
                             <tr>
                                 <th>Paciente</th>
-                                <th>Doctor</th>
+                                <th>Fisioterapeuta</th>
                                 <th>Ejercicio</th>
                                 <th>Estado</th>
                                 <th>Progreso</th>
                             </tr>
                         </thead>
                         <tbody id="globalAssignmentsTable">
-                            <tr><td colspan="5">Cargando rutinas y nombres del hospital...</td></tr>
+                            <tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Cargando rutinas del sistema...</td></tr>
                         </tbody>
                     </table>
                 </div>
                 
-                <div id="paginacionRutinas" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding-bottom: 10px; flex-wrap: wrap;">
-                </div>
+                <div id="paginacionRutinas" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px;"></div>
             </div>
 
         </div>
-    </div>
+
     </div>
 
     <script type="module" src="js/admin.js"></script>

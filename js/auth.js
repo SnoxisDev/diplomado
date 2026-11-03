@@ -3,122 +3,137 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswor
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const authForm = document.getElementById('authForm');
-const toggleBtn = document.getElementById('toggleBtn');
-const toggleText = document.getElementById('toggleText');
-const registerFields = document.getElementById('registerFields');
 
-let isRegistering = false; 
-
-toggleBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    isRegistering = !isRegistering;
-    const btnSubmit = authForm.querySelector('button');
-
-    if (isRegistering) {
-        registerFields.style.display = 'block';
-        toggleText.innerText = "¿Ya tienes cuenta?";
-        toggleBtn.innerText = "Inicia Sesión aquí";
-        btnSubmit.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Cuenta';
-    } else {
-        registerFields.style.display = 'none';
-        toggleText.innerText = "¿No tienes cuenta?";
-        toggleBtn.innerText = "Regístrate aquí";
-        btnSubmit.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+// Sincronizar el modo de autenticación si existe la función global
+if (typeof window.cambiarModoAuth === 'function') {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'register') {
+        window.cambiarModoAuth(true);
     }
-});
+}
 
-authForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const btnSubmit = authForm.querySelector('button');
+if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Determinar si estamos registrando o iniciando sesión
+        const isRegistering = (typeof window.isRegisteringMode !== 'undefined') 
+            ? window.isRegisteringMode 
+            : (document.getElementById('registerFields').style.display !== 'none');
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const btnSubmit = document.getElementById('btnSubmitAuth') || authForm.querySelector('button[type="submit"]');
 
-    const originalText = btnSubmit.innerHTML;
-    btnSubmit.disabled = true;
-    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
 
-    try {
-        if (isRegistering) {
-            const nombre = document.getElementById('nombre').value;
-            const rol = document.getElementById('rol').value;
+        try {
+            if (isRegistering) {
+                const nombreInput = document.getElementById('nombre');
+                const nombre = nombreInput ? nombreInput.value.trim() : "";
+                const rol = document.getElementById('rol').value;
 
-            if(!nombre) throw new Error("El nombre es obligatorio");
-
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            await setDoc(doc(db, "users", user.uid), {
-                nombre: nombre,
-                email: email,
-                rol: rol,
-                fecha_registro: new Date()
-            });
-
-            // ALERTA SWEETALERT: Registro Exitoso
-            Swal.fire({
-                title: '¡Registro Exitoso!',
-                text: `Bienvenido a SIRA, ${nombre}`,
-                icon: 'success',
-                confirmButtonColor: '#3b82f6'
-            }).then(() => {
-                redirigir(rol);
-            });
-
-       } else {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            if (user.email === "admin@gmail.com") {
-                // ALERTA SWEETALERT: Admin Login
-                Swal.fire({
-                    title: '¡Hola Admin!',
-                    text: 'Accediendo al panel de control...',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = "dashboard-admin.html";
-                });
-                return; 
-            }
-
-            const docSnap = await getDoc(doc(db, "users", user.uid));
-            
-            if (docSnap.exists()) {
-                // 🔒 NUEVO: VERIFICACIÓN DE BLOQUEO
-                if (docSnap.data().estado === 'bloqueado') {
-                    // Importar y ejecutar el cierre de sesión inmediatamente
-                    const { signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
-                    await signOut(auth);
-                    throw new Error("Tu cuenta ha sido bloqueada por el Administrador. Contacta a soporte.");
+                if (!nombre) {
+                    throw new Error("Por favor, ingresa tu nombre completo para el registro.");
                 }
 
-                redirigir(docSnap.data().rol);
-            } else {
-                throw new Error("Usuario sin datos en la base de datos.");
-            }
-        }
-    } catch (error) {
-        console.error(error);
-        
-        let msg = error.message;
-        if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
-        if (error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
-        if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil (mínimo 6 caracteres).";
+                // Crear usuario en Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-        // ALERTA SWEETALERT: Error
-        Swal.fire({
-            title: 'Acceso Denegado',
-            text: msg,
-            icon: 'error',
-            confirmButtonColor: '#ef4444'
-        });
-        
-        btnSubmit.disabled = false;
-        btnSubmit.innerHTML = originalText;
-    }
-});
+                // Guardar documento en Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    nombre: nombre,
+                    email: email,
+                    rol: rol,
+                    fecha_registro: new Date(),
+                    estado: "activo"
+                });
+
+                // Registrar en bitácora de auditoría
+                try {
+                    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                    await addDoc(collection(db, "bitacora"), {
+                        fecha: new Date(),
+                        usuario_id: user.uid,
+                        accion: "NUEVO REGISTRO",
+                        detalle: `Registro exitoso como ${rol}: ${nombre} (${email})`
+                    });
+                } catch (bErr) {
+                    console.warn("Bitácora no registrada:", bErr);
+                }
+
+                // ALERTA SWEETALERT: Registro Exitoso
+                await Swal.fire({
+                    title: '¡Registro Exitoso!',
+                    text: `Bienvenido a SIRA, ${nombre}. Tu cuenta de ${rol} ha sido creada correctamente.`,
+                    icon: 'success',
+                    confirmButtonColor: '#3b82f6',
+                    confirmButtonText: 'Continuar'
+                });
+
+                redirigir(rol);
+
+            } else {
+                // Iniciar Sesión
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                if (user.email === "admin@gmail.com") {
+                    await Swal.fire({
+                        title: '¡Hola Admin!',
+                        text: 'Accediendo al panel de control...',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    window.location.href = "dashboard-admin.html";
+                    return; 
+                }
+
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    
+                    // Verificación de Bloqueo
+                    if (userData.estado === 'bloqueado') {
+                        const { signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+                        await signOut(auth);
+                        throw new Error("Tu cuenta ha sido bloqueada por el Administrador. Contacta a soporte.");
+                    }
+
+                    redirigir(userData.rol);
+                } else {
+                    throw new Error("Usuario autenticado pero sin datos registrados en la base de datos.");
+                }
+            }
+        } catch (error) {
+            console.error("Error de autenticación:", error);
+            
+            let msg = error.message;
+            if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
+            if (error.code === 'auth/email-already-in-use') msg = "Este correo electrónico ya está registrado. Intenta iniciar sesión.";
+            if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil (debe tener al menos 6 caracteres).";
+            if (error.code === 'auth/invalid-email') msg = "El formato del correo electrónico no es válido.";
+            if (error.code === 'auth/network-request-failed') msg = "Error de conexión. Verifica tu acceso a internet o revisa si estás abriendo el proyecto con un servidor local.";
+
+            // ALERTA SWEETALERT: Error
+            Swal.fire({
+                title: 'Error de Acceso',
+                text: msg,
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Entendido'
+            });
+            
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+        }
+    });
+}
 
 function redirigir(rol) {
     if (rol === 'doctor') {
@@ -129,7 +144,7 @@ function redirigir(rol) {
 }
 
 // ==========================================
-// NUEVO: RECUPERAR CONTRASEÑA
+// RECUPERAR CONTRASEÑA
 // ==========================================
 const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
 
@@ -139,7 +154,7 @@ if (forgotPasswordBtn) {
         
         const { value: emailToReset } = await Swal.fire({
             title: 'Recuperar Contraseña',
-            text: 'Ingresa el correo con el que te registraste:',
+            text: 'Ingresa tu correo registrado para enviarte un enlace:',
             icon: 'info',
             input: 'email',
             inputPlaceholder: 'usuario@ejemplo.com',
@@ -154,13 +169,14 @@ if (forgotPasswordBtn) {
                 await sendPasswordResetEmail(auth, emailToReset);
                 Swal.fire(
                     '¡Correo Enviado!', 
-                    'Revisa tu bandeja de entrada (o la carpeta de SPAM) para crear una nueva contraseña.', 
+                    'Revisa tu bandeja de entrada (o carpeta de SPAM) para reestablecer tu contraseña.', 
                     'success'
                 );
             } catch (error) {
                 console.error("Error al enviar correo:", error);
-                let msg = 'No se pudo enviar el correo. Verifica que esté bien escrito.';
-                if (error.code === 'auth/user-not-found') msg = 'No hay ninguna cuenta registrada con este correo.';
+                let msg = 'No se pudo enviar el correo de recuperación.';
+                if (error.code === 'auth/user-not-found') msg = 'No existe ninguna cuenta registrada con este correo.';
+                if (error.code === 'auth/invalid-email') msg = 'El correo electrónico no es válido.';
                 
                 Swal.fire('Error', msg, 'error');
             }
