@@ -53,10 +53,13 @@
 <body class="auth-page">
 
     <!-- Enlace superior para volver al inicio -->
-    <div class="auth-top-nav">
+    <div class="auth-top-nav" style="display: flex; justify-content: space-between; align-items: center; max-width: 440px; margin: 0 auto 15px auto; padding: 0 10px;">
         <a href="index.html" class="btn-back-home">
-            <i class="fa-solid fa-arrow-left"></i> Volver a la página principal
+            <i class="fa-solid fa-arrow-left"></i> Inicio
         </a>
+        <button type="button" onclick="instalarPWA()" class="btn" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; cursor: pointer;">
+            <i class="fa-solid fa-mobile-screen-button"></i> Instalar App
+        </button>
     </div>
 
     <div class="login-container" style="padding: 20px 15px;">
